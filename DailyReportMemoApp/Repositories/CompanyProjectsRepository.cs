@@ -4,6 +4,7 @@ using DailyReportMemoApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,39 @@ namespace DailyReportMemoApp.Repositories
                        .ToList();
             };
         }
+
+        /// <summary>
+        /// 企業案件のリストを取得するメソッド（重複なし）
+        /// </summary>
+        /// <returns></returns>
+        public List<CompanyProjectItem> GetCompanyProjectsDistinct()
+        {
+            using (var db = new AppDbContext())
+            {
+                return db.CompanyProjects
+                            .Include(x => x.Companies)
+                            .Include(x => x.Projects)
+                            .Select(x => new
+                            {
+                                CompanyId = x.CompanyId,
+                                ProjectId = x.ProjectId,
+                                CompanyName = x.Companies!.CompanyName,
+                                ProjectName = x.Projects!.ProjectName,
+                            })
+                            .Distinct()
+                            .OrderBy(x => x.CompanyId)
+                            .ThenBy(x => x.ProjectId)
+                            .Select(x => new CompanyProjectItem
+                            {
+                                CompanyId = x.CompanyId,
+                                ProjectId = x.ProjectId,
+                                CompanyName = x.CompanyName,
+                                ProjectName = x.ProjectName
+                            })
+                            .ToList();
+            }
+        }
+
 
         /// <summary>
         /// 会社案件を追加するメソッド

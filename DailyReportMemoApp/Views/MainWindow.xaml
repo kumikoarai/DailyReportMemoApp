@@ -85,6 +85,7 @@
                         Width="Auto"
                         Height="Auto"
                         Style="{StaticResource SettingButtonStyle}"
+                        Click="OpenPastWorkLogsWindow_Click"
                         />
                 
                 <Button Content="デフォルト作業設定"

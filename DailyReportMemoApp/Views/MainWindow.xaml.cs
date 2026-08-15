@@ -1,6 +1,7 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Views;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -73,6 +74,17 @@ namespace DailyReportMemoApp
             };
 
             specialTasksEntryWindow.ShowDialog();
+
+        }
+
+        private void OpenPastWorkLogsWindow_Click(object sender, RoutedEventArgs e)
+        {
+            PastWorkLogsWindow pastWorkLogsWindow = new()
+            {
+                Owner = this
+            };
+
+            pastWorkLogsWindow.ShowDialog();
 
         }
 

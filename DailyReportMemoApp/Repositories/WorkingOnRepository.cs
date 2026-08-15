@@ -1,5 +1,6 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
+using DailyReportMemoApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,32 @@ namespace DailyReportMemoApp.Repositories
                        .FirstOrDefault(x => x.WorkingOnFlg);
             };
 
+        }
+
+        /// <summary>
+        /// 過去作業ログのすべての年月種類を取得する
+        /// </summary>
+        /// <returns></returns>
+        public List<YearMonthItem> GetWorkYearMonth() 
+        {
+            using (var db = new AppDbContext())
+            {
+                return db.WorkingOnLogs
+                            .Select(x => new
+                            {
+                                Year = x.WorkDate.Year,
+                                Month = x.WorkDate.Month
+                            })
+                            .Distinct()
+                            .OrderByDescending(x => x.Year)
+                            .ThenByDescending(x => x.Month)
+                            .Select(x => new YearMonthItem
+                            {
+                                Year = x.Year,
+                                Month = x.Month
+                            })
+                            .ToList();
+            }
         }
 
         /// <summary>

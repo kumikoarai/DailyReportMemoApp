@@ -250,7 +250,7 @@ namespace DailyReportMemoApp.Views
                 // 会社名・プロジェクト名の合計作業時間を表示する
                 title.Inlines.Clear();
 
-                title.Inlines.Add(new Run($"{ttlNameForTime}　({worktimesCP.Hours}時間{worktimesCP.Minutes}分)")
+                title.Inlines.Add(new Run($"{ttlNameForTime}　({(int)worktimesCP.TotalHours}時間{worktimesCP.Minutes}分)")
                 {
                     FontWeight = FontWeights.Bold,
                     FontSize = 16

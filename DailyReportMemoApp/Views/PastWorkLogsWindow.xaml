@@ -1,0 +1,30 @@
+﻿<Window x:Class="DailyReportMemoApp.Views.PastWorkLogsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DailyReportMemoApp.Views"
+        mc:Ignorable="d"
+        Title="過去作業ログ" Height="900" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource CommonWindowStyle}">
+    
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左側メニュー -->
+        <ScrollViewer Grid.Row="0"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="BtnListPanel" />
+        </ScrollViewer>
+
+        <!-- 右側 -->
+        <Frame x:Name="ContentFrame"
+               Grid.Column="1"
+               NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>
