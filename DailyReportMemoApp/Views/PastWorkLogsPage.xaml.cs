@@ -489,7 +489,8 @@ namespace DailyReportMemoApp.Views
                     AcceptsReturn = true,          // Enterで改行
                     TextWrapping = TextWrapping.Wrap, // 長い文章は折り返す
                     VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                    IsReadOnly = true
                 };
                 WorkLogsPanel.Children.Add(TTLProjectMemoText);
             }

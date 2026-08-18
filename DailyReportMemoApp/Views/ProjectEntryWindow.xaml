@@ -43,10 +43,11 @@
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
                         <ListBox x:Name="CompaniesListBox"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  SelectionChanged="CompaniesListBox_SelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding CompanyName}" />
+                                    <TextBlock Text="{Binding CompanyName}" TextWrapping="Wrap" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -100,10 +101,11 @@
                           HorizontalScrollBarVisibility="Disabled">
                         <ListBox x:Name="ProjectsListBox"
                                  IsEnabled="False"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  SelectionChanged="ProjectsListBox_SelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Projects.ProjectName}" />
+                                    <TextBlock Text="{Binding Projects.ProjectName}" TextWrapping="Wrap" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -162,10 +164,11 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                         <ListBox x:Name="TaskItemsListBox"
-                                 IsEnabled="False">
+                                 IsEnabled="False"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding TaskItems.TaskItemName}" />
+                                    <TextBlock Text="{Binding TaskItems.TaskItemName}" TextWrapping="Wrap" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

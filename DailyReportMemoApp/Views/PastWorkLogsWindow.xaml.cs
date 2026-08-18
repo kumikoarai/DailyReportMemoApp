@@ -85,7 +85,7 @@ namespace DailyReportMemoApp.Views
 
 
             //企業・案件のラベルを追加-------------------------------------------
-            var CompaniesProjectsTTL = CreateTTLTextBoxBlock("企業・案件");
+            var CompaniesProjectsTTL = CreateTTLTextBoxBlock("会社・案件");
             BtnListPanel.Children.Add(CompaniesProjectsTTL);
 
             //企業・案件ごとにExpanderを作成し、案件ボタンを追加---------------------

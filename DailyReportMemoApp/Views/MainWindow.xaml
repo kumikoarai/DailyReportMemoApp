@@ -102,6 +102,7 @@
                         Width="Auto"
                         Height="Auto"
                         Style="{StaticResource SettingButtonStyle}"
+                        Click="OpenProjectManagementWindow_Click"
                         />
             </StackPanel>
         </Grid>

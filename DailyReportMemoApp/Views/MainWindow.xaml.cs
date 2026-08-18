@@ -88,5 +88,16 @@ namespace DailyReportMemoApp
 
         }
 
+        private void OpenProjectManagementWindow_Click(object sender, RoutedEventArgs e)
+        {
+            ProjectManagementWindow projectManagementWindow = new()
+            {
+                Owner = this
+            };
+
+            projectManagementWindow.ShowDialog();
+
+        }
+
     }
 }
