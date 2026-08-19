@@ -62,7 +62,7 @@ namespace DailyReportMemoApp.Views
                         Text = $"{company.CompanyName}",
                         TextWrapping = TextWrapping.Wrap
                     },
-                    Tag = company.CompanyId,
+                    Tag = company,
                 };
 
                 companyButton.Click += CompanyButton_Click;
@@ -110,7 +110,7 @@ namespace DailyReportMemoApp.Views
         }
 
         /// <summary>
-        /// 案件ボタン押下時の処理
+        /// 会社ボタン押下時の処理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -122,12 +122,12 @@ namespace DailyReportMemoApp.Views
             }
 
             // 選択されたラジオボタンの作業ログを取得
-            if (companyButton.Tag is not int companyId)
+            if (companyButton.Tag is not Company company)
             {
                 return;
             }
 
-            ContentFrame.Navigate(new ProjectManagementPage(companyId));
+            ContentFrame.Navigate(new ProjectManagementPage(company));
         }
 
     }

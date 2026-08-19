@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -25,8 +26,11 @@ namespace DailyReportMemoApp.Views
     {
         private CompanyProjectsRepository _companyProjectsRepository = new();
         private ProjectTaskItemsRepository _projectTaskItemsRepository = new();
+        private ProjectsRepository _projectsRepository = new();
+        private TaskItemsRepository _taskItemsRepository = new();
+        private Company _company = new();
 
-        public ProjectManagementPage(int companyId)
+        public ProjectManagementPage(Company company)
         {
             InitializeComponent();
 
@@ -41,17 +45,17 @@ namespace DailyReportMemoApp.Views
             //};
 
             //ProjectsPanel.Children.Add(TTLText);
-
-            LoadProjects(companyId);
+            _company = company;
+            LoadProjects();
         }
 
         /// <summary>
         /// 会社に関連する案件のリストを取得してDataGridにバインドするメソッド
         /// </summary>
-        private void LoadProjects(int companyId)
+        private void LoadProjects()
         {
             // 選択された会社に関連する案件のリストを取得してDataGridにバインドする
-            ProjectsListBox.ItemsSource = _companyProjectsRepository.GetCompanyProjects(companyId);
+            ProjectsListBox.ItemsSource = _companyProjectsRepository.GetCompanyProjects(_company.CompanyId);
         }
 
         /// <summary>
@@ -80,17 +84,28 @@ namespace DailyReportMemoApp.Views
             {
                 TaskItemsListBox.ItemsSource = null;
                 TaskItemsListBox.IsEnabled = false;
+                ProjectReNameBorder.Visibility = Visibility.Collapsed;
+                TaskItemsListBorder.Visibility = Visibility.Collapsed;
+                ProjectSaveBtn.Visibility = Visibility.Collapsed;
 
                 return;
             }
 
             // 選択された案件に関連する作業のリストを取得してDataGridにバインドする
             LoadProjectTaskItems(selectedProject.CompanyProjectId);
+            ProjectReNameBox.Text = selectedProject.Projects?.ProjectName ?? "";
+            ProjectsMemoPanel.Text = selectedProject.Memo ?? "";
 
             // 作業のリストを有効化する
             TaskItemsListBox.IsEnabled = true;
             TaskItemName.IsEnabled = true;
             TaskItemNameBtn.IsEnabled = true;
+            //アニメーションで表示する
+            ShowBorders(
+                ProjectReNameBorder,
+                TaskItemsListBorder
+                );
+            ProjectSaveBtn.Visibility = Visibility.Visible;
         }
 
 
@@ -101,46 +116,46 @@ namespace DailyReportMemoApp.Views
         /// <param name="e"></param>
         private void ProjectEntry_Click(object sender, RoutedEventArgs e)
         {
-            //var projectName = ProjectName.Text.Trim();
+            var projectName = ProjectName.Text.Trim();
 
-            //if (string.IsNullOrWhiteSpace(projectName))
-            //{
-            //    MessageBox.Show("案件名を入力してください。");
-            //    return;
-            //}
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                MessageBox.Show("案件名を入力してください。");
+                return;
+            }
 
 
-            //// 選択された会社を取得する
-            //var selectedCompany = CompaniesListBox.SelectedItem as Company;
-            //if (selectedCompany == null)
-            //{
-            //    MessageBox.Show("会社を選択してください。");
-            //    return;
-            //}
-            //else
-            //{
+            // 選択された会社を取得する
+            var selectedCompany = _company;
+            if (selectedCompany == null)
+            {
+                MessageBox.Show("会社を選択してください。");
+                return;
+            }
+            else
+            {
 
-            //    // 会社に関連する案件を追加する
-            //    var project = new Project
-            //    {
-            //        ProjectName = projectName,
-            //        Completed = false,
-            //        CreatedAt = DateTime.Now
-            //    };
-            //    var newProject = _projectsRepository.AddProject(project);
+                // 会社に関連する案件を追加する
+                var project = new Project
+                {
+                    ProjectName = projectName,
+                    Completed = false,
+                    CreatedAt = DateTime.Now
+                };
+                var newProject = _projectsRepository.AddProject(project);
 
-            //    // 会社と案件の関連を追加する
-            //    var companyProject = new CompanyProject
-            //    {
-            //        CompanyId = selectedCompany.CompanyId,
-            //        ProjectId = newProject.ProjectId,
-            //        CreatedAt = DateTime.Now
-            //    };
-            //    _companyProjectsRepository.AddCompanyProject(companyProject);
-            //}
+                // 会社と案件の関連を追加する
+                var companyProject = new CompanyProject
+                {
+                    CompanyId = selectedCompany.CompanyId,
+                    ProjectId = newProject.ProjectId,
+                    CreatedAt = DateTime.Now
+                };
+                _companyProjectsRepository.AddCompanyProject(companyProject);
+            }
 
-            //LoadCompanyProjects(selectedCompany.CompanyId);
-            //ProjectName.Text = "";
+            LoadProjects();
+            ProjectName.Text = "";
         }
 
 
@@ -151,51 +166,95 @@ namespace DailyReportMemoApp.Views
         /// <param name="e"></param>
         private void TaskItemEntry_Click(object sender, RoutedEventArgs e)
         {
-            //var taskItemName = TaskItemName.Text.Trim();
+            var taskItemName = TaskItemName.Text.Trim();
 
-            //if (string.IsNullOrWhiteSpace(taskItemName))
-            //{
-            //    MessageBox.Show("作業名を入力してください。");
-            //    return;
-            //}
+            if (string.IsNullOrWhiteSpace(taskItemName))
+            {
+                MessageBox.Show("作業名を入力してください。");
+                return;
+            }
 
-            //var selectedCompany = CompaniesListBox.SelectedItem as Company;
-            //var selectedProject = ProjectsListBox.SelectedItem as CompanyProject;
+            var selectedCompany = _company;
+            var selectedProject = ProjectsListBox.SelectedItem as CompanyProject;
 
-            //if (selectedCompany == null)
-            //{
-            //    MessageBox.Show("会社を選択してください。");
-            //    return;
-            //}
+            if (selectedCompany == null)
+            {
+                MessageBox.Show("会社を選択してください。");
+                return;
+            }
 
-            //if (selectedProject == null)
-            //{
-            //    MessageBox.Show("案件を選択してください。");
-            //    return;
-            //}
+            if (selectedProject == null)
+            {
+                MessageBox.Show("案件を選択してください。");
+                return;
+            }
 
-            //// 選択された案件に関連する作業を追加する
-            //var taskItem = new TaskItem
-            //{
-            //    TaskItemName = taskItemName,
-            //    CreatedAt = DateTime.Now
-            //};
-            //var newTaskItem = _taskItemsRepository.AddTaskItem(taskItem);
+            // 選択された案件に関連する作業を追加する
+            var taskItem = new TaskItem
+            {
+                TaskItemName = taskItemName,
+                CreatedAt = DateTime.Now
+            };
+            var newTaskItem = _taskItemsRepository.AddTaskItem(taskItem);
 
-            //// 案件と作業の関連を追加する
-            //var projectTaskItem = new ProjectTaskItem
-            //{
-            //    CompanyProjectId = selectedProject.CompanyProjectId,
-            //    TaskItemId = newTaskItem.TaskItemId,
-            //    IsCurrent = false,
-            //    CreatedAt = DateTime.Now
-            //};
-            //_projectTaskItemsRepository.AddProjectTaskItem(projectTaskItem);
+            // 案件と作業の関連を追加する
+            var projectTaskItem = new ProjectTaskItem
+            {
+                CompanyProjectId = selectedProject.CompanyProjectId,
+                TaskItemId = newTaskItem.TaskItemId,
+                IsCurrent = false,
+                CreatedAt = DateTime.Now
+            };
+            _projectTaskItemsRepository.AddProjectTaskItem(projectTaskItem);
 
-            //// 選択された案件に関連する作業のリストを更新する
-            //LoadProjectTaskItems(selectedProject.CompanyProjectId);
-            //TaskItemName.Text = "";
+            // 選択された案件に関連する作業のリストを更新する
+            LoadProjectTaskItems(selectedProject.CompanyProjectId);
+            TaskItemName.Text = "";
         }
 
+        /// <summary>
+        /// アニメーションでボーダーを表示するメソッド
+        /// </summary>
+        /// <param name="borders"></param>
+        private void ShowBorders(params Border[] borders)
+        {
+            foreach (var border in borders)
+            {
+                border.Visibility = Visibility.Visible;
+                border.Opacity = 0;
+
+                var transform = new TranslateTransform();
+                border.RenderTransform = transform;
+
+                var easing = new CubicEase
+                {
+                    EasingMode = EasingMode.EaseOut
+                };
+
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromMilliseconds(1000),
+                    EasingFunction = easing
+                };
+
+                var moveAnimation = new DoubleAnimation
+                {
+                    From = -10,
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(800),
+                    EasingFunction = easing
+                };
+
+                border.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    fadeAnimation);
+
+                transform.BeginAnimation(
+                    TranslateTransform.YProperty,
+                    moveAnimation);
+            }
+        }
     }
 }
