@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DailyReportMemoApp.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="900" d:DesignWidth="580"
+      d:DesignHeight="810" d:DesignWidth="580"
       Title="ProjectManagementPage">
     <Grid Margin="10,0,10,0">
         <Grid.RowDefinitions>
@@ -159,7 +159,7 @@
                 BorderThickness="1"
                 Margin="0"
                 Padding="10"
-                Height="300"
+                Height="250"
                 Visibility="Collapsed">
             <Grid>
                 <Grid.RowDefinitions>
@@ -174,36 +174,37 @@
                            FontWeight="Bold"
                            Margin="0,0,0,10" />
 
-                <ListBox x:Name="TaskItemsListBox"
-                         Grid.Row="1"
-                         SelectionMode="Multiple"
-                         HorizontalContentAlignment="Stretch"
-                         IsEnabled="False"
-                         Margin="0,0,0,10"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer
+                    Grid.Row="1"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Margin="0,0,0,10">
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
+                    <ItemsControl
+                        x:Name="TaskItemsListBox"
+                        ItemsSource="{Binding}">
+                        
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
 
-                                <CheckBox
-                                    Margin="0,0,8,0"
-                                    VerticalAlignment="Center"
-                                    IsChecked="{Binding
-                                                RelativeSource={RelativeSource AncestorType=ListBoxItem},
-                                                Path=IsSelected,
-                                                Mode=TwoWay}" />
+                                <Border
+                                    Padding="3"
+                                    Margin="0,0,0,4"
+                                    BorderThickness="0,0,0,1"
+                                    BorderBrush="#DDDDDD">
 
-                                <TextBlock
-                                    Text="{Binding TaskItems.TaskItemName}"
-                                    TextWrapping="Wrap"
-                                    VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{Binding TaskItems.TaskItemName}"
+                                        TextWrapping="Wrap"
+                                        VerticalAlignment="Center" />
 
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                                </Border>
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </ScrollViewer>
 
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
@@ -233,7 +234,7 @@
                 </Grid>
             </Grid>
         </Border>
-
+        
         <Button Grid.Row="3"
                 Content="適用"
                 Width="Auto"
@@ -242,7 +243,7 @@
                 Visibility="Collapsed"
                 Margin="0, 20"
                 x:Name="ProjectSaveBtn"
-                Click="ProjectEntry_Click"
+                Click="ProjectSaveBtn_Click"
                 />
 
     </Grid>

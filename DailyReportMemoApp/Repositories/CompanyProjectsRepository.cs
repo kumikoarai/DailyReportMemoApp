@@ -25,10 +25,27 @@ namespace DailyReportMemoApp.Repositories
                 return db.CompanyProjects
                        .Include(x => x.Companies)
                        .Include(x => x.Projects)
+                       .Where(cp => cp.CompanyId == companyId && cp.Projects!.Completed == false)
+                       .ToList();
+            };
+        }
+
+        /// <summary>
+        /// 一括案件管理画面から会社案件のリストを取得するメソッド（完了済み案件も含む）
+        /// </summary>
+        /// <returns></returns>
+        public List<CompanyProject> GetCompanyProjectsFromManagement(int companyId)
+        {
+            using (var db = new AppDbContext())
+            {
+                return db.CompanyProjects
+                       .Include(x => x.Companies)
+                       .Include(x => x.Projects)
                        .Where(cp => cp.CompanyId == companyId)
                        .ToList();
             };
         }
+
 
         /// <summary>
         /// 企業案件のリストを取得するメソッド（重複なし）
@@ -97,7 +114,7 @@ namespace DailyReportMemoApp.Repositories
 
                 if (targetWorkLog == null)
                 {
-                    MessageBox.Show("保存対象の作業データが見つかりませんでした。");
+                    MessageBox.Show("保存対象の会社案件が見つかりませんでした。");
                     return null;
                 }
 
@@ -115,6 +132,28 @@ namespace DailyReportMemoApp.Repositories
             }
         }
 
+        /// <summary>
+        /// 一括案件管理画面から会社案件のメモを更新するメソッド
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="companyProjectId"></param>
+        /// <param name="memo"></param>
+        /// <param name="now"></param>
+        public void UpdateCompanyProjectMemoFromManagement(AppDbContext db, int companyProjectId, String memo, DateTime now)
+        {
+            var companyProject = db.CompanyProjects
+                .FirstOrDefault(x => x.CompanyProjectId == companyProjectId);
 
+            if (companyProject == null)
+            {
+                MessageBox.Show("更新対象の会社案件が見つかりませんでした。");
+                return;
+            }
+
+            companyProject.Memo = memo;
+            companyProject.UpdatedAt = now;
+
+
+        }
     }
 }

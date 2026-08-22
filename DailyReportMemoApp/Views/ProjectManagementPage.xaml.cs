@@ -1,5 +1,6 @@
 ﻿using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Services;
 using DailyReportMemoApp.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -29,22 +30,12 @@ namespace DailyReportMemoApp.Views
         private ProjectsRepository _projectsRepository = new();
         private TaskItemsRepository _taskItemsRepository = new();
         private Company _company = new();
+        private ProjectManagement _projectManagement = new();
 
         public ProjectManagementPage(Company company)
         {
             InitializeComponent();
 
-            //var TTLText = new TextBlock
-            //{
-            //    Margin = new Thickness(0, 0, 0, 20),
-            //    Text = $"テストととと: {companyId}",
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //    TextWrapping = TextWrapping.Wrap,
-            //    FontSize = 16,
-            //    FontWeight = FontWeights.Bold
-            //};
-
-            //ProjectsPanel.Children.Add(TTLText);
             _company = company;
             LoadProjects();
         }
@@ -55,7 +46,7 @@ namespace DailyReportMemoApp.Views
         private void LoadProjects()
         {
             // 選択された会社に関連する案件のリストを取得してDataGridにバインドする
-            ProjectsListBox.ItemsSource = _companyProjectsRepository.GetCompanyProjects(_company.CompanyId);
+            ProjectsListBox.ItemsSource = _companyProjectsRepository.GetCompanyProjectsFromManagement(_company.CompanyId);
         }
 
         /// <summary>
@@ -95,6 +86,9 @@ namespace DailyReportMemoApp.Views
             LoadProjectTaskItems(selectedProject.CompanyProjectId);
             ProjectReNameBox.Text = selectedProject.Projects?.ProjectName ?? "";
             ProjectsMemoPanel.Text = selectedProject.Memo ?? "";
+            ProjectReNameBox.Tag = selectedProject.Projects?.ProjectId;
+            ProjectsMemoPanel.Tag = selectedProject.CompanyProjectId;
+            CompletedBox.IsChecked = selectedProject.Projects?.Completed;
 
             // 作業のリストを有効化する
             TaskItemsListBox.IsEnabled = true;
@@ -256,5 +250,53 @@ namespace DailyReportMemoApp.Views
                     moveAnimation);
             }
         }
+
+        /// <summary>
+        /// 適用するボタンがクリックされたときの処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProjectSaveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var projectName = ProjectReNameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                MessageBox.Show("案件名を入力してください。");
+                return;
+            }
+
+            // 変更された案件名のIDを取得する
+            if (ProjectReNameBox.Tag is not int projectId)
+            {
+                return;
+            }
+
+            // 変更された案件のメモのIDを取得する
+            if (ProjectsMemoPanel.Tag is not int companyProjectId)
+            {
+                return;
+            }
+
+            // 案件情報を更新する
+            var rslt = _projectManagement.ProjectUpdate(
+                projectId,
+                projectName,
+                CompletedBox.IsChecked ?? false,
+                companyProjectId,
+                ProjectsMemoPanel.Text.Trim()
+                );
+
+            if(rslt)
+            {
+                MessageBox.Show("案件情報を更新しました。");
+                LoadProjects();
+            }
+            else
+            {
+                MessageBox.Show("案件情報の更新に失敗しました。");
+            }
+        }
+
     }
 }

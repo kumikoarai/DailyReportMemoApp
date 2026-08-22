@@ -23,8 +23,26 @@
         </ScrollViewer>
 
         <!-- 右側 -->
-        <Frame x:Name="ContentFrame"
-               Grid.Column="1"
-               NavigationUIVisibility="Hidden"/>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Frame Grid.Row="0"
+                   x:Name="ContentFrame"
+                   Grid.Column="1"
+                   NavigationUIVisibility="Hidden"/>
+
+            <Button Grid.Row="1"
+                    Content="閉じる"
+                    Margin="0,20,0,0"
+                    Width="100"
+                    Height="30"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Click="CloseProjectManagement_Click"/>
+        </Grid>
+
     </Grid>
 </Window>

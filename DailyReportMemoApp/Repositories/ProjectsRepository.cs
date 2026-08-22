@@ -1,10 +1,12 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
+using DailyReportMemoApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DailyReportMemoApp.Repositories
 {
@@ -38,5 +40,28 @@ namespace DailyReportMemoApp.Repositories
             return project;
         }
 
+        /// <summary>
+        /// 案件名を更新するメソッド
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="projectId"></param>
+        /// <param name="projectName"></param>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        public void UpdateProjectName(AppDbContext db, int projectId, String projectName, bool completedProject, DateTime now)
+        {
+            var project = db.Projects
+                .FirstOrDefault(x => x.ProjectId == projectId);
+
+            if (project == null)
+            {
+                MessageBox.Show("更新対象の案件データが見つかりませんでした。");
+                return;
+            }
+
+            project.ProjectName = projectName;
+            project.Completed = completedProject;
+            project.UpdatedAt = now;
+        }
     }
 }

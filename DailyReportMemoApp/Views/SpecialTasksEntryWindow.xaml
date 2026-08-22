@@ -30,9 +30,9 @@
                     Click="SpecialTaskEntry_Click"/>
 
             </StackPanel>
-            <Button Content="戻る"
+            <Button Content="閉じる"
                     Width="100"
-                    Height="35"
+                    Height="30"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     Click="CloseSpecialTaskEntry_Click"/>

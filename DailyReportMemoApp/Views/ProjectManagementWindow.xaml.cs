@@ -130,5 +130,15 @@ namespace DailyReportMemoApp.Views
             ContentFrame.Navigate(new ProjectManagementPage(company));
         }
 
+        /// <summary>
+        /// 閉じるボタンがクリックされたときの処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseProjectManagement_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
     }
 }
