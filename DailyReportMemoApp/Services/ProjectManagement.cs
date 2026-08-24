@@ -19,7 +19,7 @@ namespace DailyReportMemoApp.Services
         /// <param name="completedProject"></param>
         /// <param name="companyProjectId"></param>
         /// <param name="memo"></param>
-        public bool ProjectUpdate(int projectId, String projectName, bool completedProject, int companyProjectId, String memo)
+        public void ProjectUpdate(int projectId, String projectName, bool completedProject, int companyProjectId, String memo)
         {
             using var db = new AppDbContext();
             using var transaction = db.Database.BeginTransaction();
@@ -40,7 +40,6 @@ namespace DailyReportMemoApp.Services
 
                 transaction.Commit();
 
-                return true;
             }
             catch
             {

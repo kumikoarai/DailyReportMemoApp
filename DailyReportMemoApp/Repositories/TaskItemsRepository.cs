@@ -28,13 +28,10 @@ namespace DailyReportMemoApp.Repositories
         /// 作業項目を追加するメソッド
         /// </summary>
         /// <param name="taskItem"></param>
-        public TaskItem AddTaskItem(TaskItem taskItem)
+        public TaskItem AddTaskItem(AppDbContext db, TaskItem taskItem)
         {
-            using (var db = new AppDbContext())
-            {
-                db.TaskItems.Add(taskItem);
-                db.SaveChanges();
-            }
+            db.TaskItems.Add(taskItem);
+            db.SaveChanges();
 
             return taskItem;
         }

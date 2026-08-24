@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:DailyReportMemoApp.Views"
       mc:Ignorable="d" 
       d:DesignHeight="810" d:DesignWidth="580"
-      Title="ProjectManagementPage">
+      Title="一括案件管理">
     <Grid Margin="10,0,10,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

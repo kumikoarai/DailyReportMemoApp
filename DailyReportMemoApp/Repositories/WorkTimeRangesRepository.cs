@@ -1,4 +1,5 @@
-﻿using DailyReportMemoApp.Models;
+﻿using DailyReportMemoApp.Data;
+using DailyReportMemoApp.Models;
 using DailyReportMemoApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -36,13 +37,10 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="workTimeRange"></param>
         /// <returns></returns>
-        public WorkTimeRange AddWorkTimeRange(WorkTimeRange workTimeRange)
+        public WorkTimeRange AddWorkTimeRange(AppDbContext db, WorkTimeRange workTimeRange)
         { 
-            using (var db = new Data.AppDbContext())
-            {
-                 db.WorkTimeRanges.Add(workTimeRange);
-                 db.SaveChanges();
-            }
+            db.WorkTimeRanges.Add(workTimeRange);
+            db.SaveChanges();
             return workTimeRange;
         }
 
@@ -51,20 +49,17 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="workTimeRange"></param>
         /// <returns></returns>
-        public bool UpdateWorkTimeRangeEndTime(WorkTimeRange workTimeRange, DateTime now, TimeSpan timeSpan)
+        public bool UpdateWorkTimeRangeEndTime(AppDbContext db, WorkTimeRange workTimeRange, DateTime now, TimeSpan timeSpan)
         {
-            using (var db = new Data.AppDbContext())
+            var existingWorkTimeRange = db.WorkTimeRanges.Find(workTimeRange.WorkTimeRangeId);
+            if (existingWorkTimeRange == null)
             {
-                var existingWorkTimeRange = db.WorkTimeRanges.Find(workTimeRange.WorkTimeRangeId);
-                if (existingWorkTimeRange == null)
-                {
-                    return false;
-                }
-
-                existingWorkTimeRange.EndTime = timeSpan;
-                existingWorkTimeRange.UpdatedAt = now;
-                db.SaveChanges();
+                return false;
             }
+
+            existingWorkTimeRange.EndTime = timeSpan;
+            existingWorkTimeRange.UpdatedAt = now;
+            db.SaveChanges();
             return true;
         }
 
@@ -73,19 +68,16 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="workTimeRangeId"></param>
         /// <returns></returns>
-        public bool DeleteWorkTimeRange(int workTimeRangeId) 
+        public bool DeleteWorkTimeRange(AppDbContext db, int workTimeRangeId) 
         {
-            using (var db = new Data.AppDbContext()) 
+            var workTimeRange = db.WorkTimeRanges.FirstOrDefault(x => x.WorkTimeRangeId == workTimeRangeId);
+
+            if (workTimeRange != null) 
             {
-                var workTimeRange = db.WorkTimeRanges.FirstOrDefault(x => x.WorkTimeRangeId == workTimeRangeId);
+                db.WorkTimeRanges.Remove(workTimeRange);
+                db.SaveChanges();
 
-                if (workTimeRange != null) 
-                {
-                    db.WorkTimeRanges.Remove(workTimeRange);
-                    db.SaveChanges();
-
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -96,28 +88,25 @@ namespace DailyReportMemoApp.Repositories
         /// <param name="workTimeRange"></param>
         /// <param name="workingOnId"></param>
         /// <returns></returns>
-        public bool UpdateWorkTimeRangeTimeEndTimeDel(WorkTimeRange workTimeRange, int workingOnId) 
+        public bool UpdateWorkTimeRangeTimeEndTimeDel(AppDbContext db, WorkTimeRange workTimeRange, int workingOnId) 
         {
-            using (var db = new Data.AppDbContext()) 
+            var targetWorkTimeRange = db.WorkTimeRanges
+                                .Include(wtr => wtr.WorkLogs)
+                                .FirstOrDefault(wtr =>
+                                    wtr.WorkLogs != null &&
+                                    wtr.WorkLogs.WorkingOnId == workingOnId &&
+                                    wtr.EndTime == workTimeRange.StartTime);
+
+            if (targetWorkTimeRange == null)
             {
-                var targetWorkTimeRange = db.WorkTimeRanges
-                                    .Include(wtr => wtr.WorkLogs)
-                                    .FirstOrDefault(wtr =>
-                                        wtr.WorkLogs != null &&
-                                        wtr.WorkLogs.WorkingOnId == workingOnId &&
-                                        wtr.EndTime == workTimeRange.StartTime);
-
-                if (targetWorkTimeRange == null)
-                {
-                    return false;
-                }
-
-                targetWorkTimeRange.EndTime = null;
-                targetWorkTimeRange.UpdatedAt = DateTime.Now;
-                db.SaveChanges();
-
-                return true;
+                return false;
             }
+
+            targetWorkTimeRange.EndTime = null;
+            targetWorkTimeRange.UpdatedAt = DateTime.Now;
+            db.SaveChanges();
+
+            return true;
         }
 
         /// <summary>
@@ -127,7 +116,7 @@ namespace DailyReportMemoApp.Repositories
         /// <param name="newTime"></param>
         /// <param name="workingOnId"></param>
         /// <returns></returns>
-        public ChangeWorkTimeRange UpdateWorkTimeRangeTime(WorkTime workTime, String newTime, int workingOnId)
+        public ChangeWorkTimeRange UpdateWorkTimeRangeTime(AppDbContext db, WorkTime workTime, String newTime, int workingOnId)
         {
             // newTimeをTimeSpanに変換
             if (!_common.TryParseTime(newTime, out TimeSpan parsedNewTime))
@@ -141,118 +130,115 @@ namespace DailyReportMemoApp.Repositories
                 return changeWorkTimeRange; // 変換に失敗した場合はIDを返す
             }
 
-            using (var db = new Data.AppDbContext())
+            var changeFailureWorkTimeRange = new ChangeWorkTimeRange
             {
-                var changeFailureWorkTimeRange = new ChangeWorkTimeRange
+                SuccessOrFailure = "f",
+                WorkTimeRangeId = -1
+            };
+
+            var changeSuccessWorkTimeRange = new ChangeWorkTimeRange
+            {
+                SuccessOrFailure = "s",
+                WorkTimeRangeId = -1
+            };
+
+
+            // 作業時間範囲の開始時間または終了時間を更新する処理
+            if (workTime.StartOrEnd == "start") {
+
+                // 入力された開始時間とおなじ時間を持つ終了時間のレコードの開始時間よりも、入力された新しい開始時間が小さい場合は、更新しない
+                var targetEndWorkTimeRange = db.WorkTimeRanges
+                    .Include(wtr => wtr.WorkLogs)
+                    .FirstOrDefault(wtr =>
+                        wtr.WorkLogs != null &&
+                        wtr.WorkLogs.WorkingOnId == workingOnId &&
+                        wtr.EndTime == workTime.WorkTimeRange.StartTime);
+                if (targetEndWorkTimeRange != null && parsedNewTime < targetEndWorkTimeRange.StartTime)
                 {
-                    SuccessOrFailure = "f",
-                    WorkTimeRangeId = -1
-                };
+                    changeFailureWorkTimeRange.SubTargetStartOrEnd = "end";
+                    changeFailureWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
 
-                var changeSuccessWorkTimeRange = new ChangeWorkTimeRange
-                {
-                    SuccessOrFailure = "s",
-                    WorkTimeRangeId = -1
-                };
-
-
-                // 作業時間範囲の開始時間または終了時間を更新する処理
-                if (workTime.StartOrEnd == "start") {
-
-                    // 入力された開始時間とおなじ時間を持つ終了時間のレコードの開始時間よりも、入力された新しい開始時間が小さい場合は、更新しない
-                    var targetEndWorkTimeRange = db.WorkTimeRanges
-                        .Include(wtr => wtr.WorkLogs)
-                        .FirstOrDefault(wtr =>
-                            wtr.WorkLogs != null &&
-                            wtr.WorkLogs.WorkingOnId == workingOnId &&
-                            wtr.EndTime == workTime.WorkTimeRange.StartTime);
-                    if (targetEndWorkTimeRange != null && parsedNewTime < targetEndWorkTimeRange.StartTime)
-                    {
-                        changeFailureWorkTimeRange.SubTargetStartOrEnd = "end";
-                        changeFailureWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
-
-                        return changeFailureWorkTimeRange; // 更新しない
-                    }
-
-                    // 作業時間範囲の開始時間を更新する場合
-                    var targetStartWorkTimeRange = db.WorkTimeRanges
-                        .Include(wtr => wtr.WorkLogs)
-                        .FirstOrDefault(wtr =>
-                            wtr.WorkLogs != null &&
-                            wtr.WorkTimeRangeId == workTime.WorkTimeRange.WorkTimeRangeId);
-
-                    if (targetStartWorkTimeRange == null)
-                    {
-
-                        return changeFailureWorkTimeRange;
-                    }
-
-                    targetStartWorkTimeRange.StartTime = parsedNewTime;
-                    targetStartWorkTimeRange.UpdatedAt = DateTime.Now;
-
-
-                    if (targetEndWorkTimeRange == null)
-                    {
-                        return changeFailureWorkTimeRange;
-                    }
-
-                    targetEndWorkTimeRange.EndTime = parsedNewTime;
-                    targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
-
-                    changeSuccessWorkTimeRange.SubTargetStartOrEnd = "end";
-                    changeSuccessWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
-
-
-                }
-                else if (workTime.StartOrEnd == "end") {
-                    // 入力された終了時間とおなじ時間を持つ開始時間のレコードの終了時間よりも、入力された新しい終了時間が大きい場合は、更新しない
-                    var targetStartWorkTimeRange = db.WorkTimeRanges
-                        .Include(wtr => wtr.WorkLogs)
-                        .FirstOrDefault(wtr =>
-                            wtr.WorkLogs != null &&
-                            wtr.WorkLogs.WorkingOnId == workingOnId &&
-                            wtr.StartTime == workTime.WorkTimeRange.EndTime);
-                    if (targetStartWorkTimeRange != null && parsedNewTime > targetStartWorkTimeRange.EndTime) 
-                    {
-                        changeFailureWorkTimeRange.SubTargetStartOrEnd = "start";
-                        changeFailureWorkTimeRange.WorkTimeRangeId = targetStartWorkTimeRange.WorkTimeRangeId;
-
-                        return changeFailureWorkTimeRange; // 更新しない
-                    }
-
-                    // 作業時間範囲の終了時間を更新する処理
-                    var targetEndWorkTimeRange = db.WorkTimeRanges
-                        .Include(wtr => wtr.WorkLogs)
-                        .FirstOrDefault(wtr =>
-                            wtr.WorkLogs != null &&
-                            wtr.WorkTimeRangeId == workTime.WorkTimeRange.WorkTimeRangeId);
-                    if (targetEndWorkTimeRange == null)
-                    {
-                        return changeFailureWorkTimeRange;
-                    }
-                    targetEndWorkTimeRange.EndTime = parsedNewTime;
-                    targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
-
-                    if (targetStartWorkTimeRange == null)
-                    {
-                        return changeFailureWorkTimeRange;
-                    }
-
-                    targetStartWorkTimeRange.StartTime = parsedNewTime;
-                    targetStartWorkTimeRange.UpdatedAt = DateTime.Now;
-
-                    changeSuccessWorkTimeRange.SubTargetStartOrEnd = "start";
-                    changeSuccessWorkTimeRange.WorkTimeRangeId = targetStartWorkTimeRange.WorkTimeRangeId;
-                }
-                else
-                {
-                    return changeFailureWorkTimeRange; // "start"でも"end"でもない場合は-1を返す
+                    return changeFailureWorkTimeRange; // 更新しない
                 }
 
-                db.SaveChanges();
+                // 作業時間範囲の開始時間を更新する場合
+                var targetStartWorkTimeRange = db.WorkTimeRanges
+                    .Include(wtr => wtr.WorkLogs)
+                    .FirstOrDefault(wtr =>
+                        wtr.WorkLogs != null &&
+                        wtr.WorkTimeRangeId == workTime.WorkTimeRange.WorkTimeRangeId);
 
-                return changeSuccessWorkTimeRange;
+                if (targetStartWorkTimeRange == null)
+                {
+
+                    return changeFailureWorkTimeRange;
+                }
+
+                targetStartWorkTimeRange.StartTime = parsedNewTime;
+                targetStartWorkTimeRange.UpdatedAt = DateTime.Now;
+
+
+                if (targetEndWorkTimeRange == null)
+                {
+                    return changeFailureWorkTimeRange;
+                }
+
+                targetEndWorkTimeRange.EndTime = parsedNewTime;
+                targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
+
+                changeSuccessWorkTimeRange.SubTargetStartOrEnd = "end";
+                changeSuccessWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
+
+
             }
+            else if (workTime.StartOrEnd == "end") {
+                // 入力された終了時間とおなじ時間を持つ開始時間のレコードの終了時間よりも、入力された新しい終了時間が大きい場合は、更新しない
+                var targetStartWorkTimeRange = db.WorkTimeRanges
+                    .Include(wtr => wtr.WorkLogs)
+                    .FirstOrDefault(wtr =>
+                        wtr.WorkLogs != null &&
+                        wtr.WorkLogs.WorkingOnId == workingOnId &&
+                        wtr.StartTime == workTime.WorkTimeRange.EndTime);
+                if (targetStartWorkTimeRange != null && parsedNewTime > targetStartWorkTimeRange.EndTime) 
+                {
+                    changeFailureWorkTimeRange.SubTargetStartOrEnd = "start";
+                    changeFailureWorkTimeRange.WorkTimeRangeId = targetStartWorkTimeRange.WorkTimeRangeId;
+
+                    return changeFailureWorkTimeRange; // 更新しない
+                }
+
+                // 作業時間範囲の終了時間を更新する処理
+                var targetEndWorkTimeRange = db.WorkTimeRanges
+                    .Include(wtr => wtr.WorkLogs)
+                    .FirstOrDefault(wtr =>
+                        wtr.WorkLogs != null &&
+                        wtr.WorkTimeRangeId == workTime.WorkTimeRange.WorkTimeRangeId);
+                if (targetEndWorkTimeRange == null)
+                {
+                    return changeFailureWorkTimeRange;
+                }
+                targetEndWorkTimeRange.EndTime = parsedNewTime;
+                targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
+
+                if (targetStartWorkTimeRange == null)
+                {
+                    return changeFailureWorkTimeRange;
+                }
+
+                targetStartWorkTimeRange.StartTime = parsedNewTime;
+                targetStartWorkTimeRange.UpdatedAt = DateTime.Now;
+
+                changeSuccessWorkTimeRange.SubTargetStartOrEnd = "start";
+                changeSuccessWorkTimeRange.WorkTimeRangeId = targetStartWorkTimeRange.WorkTimeRangeId;
+            }
+            else
+            {
+                return changeFailureWorkTimeRange; // "start"でも"end"でもない場合は-1を返す
+            }
+
+            db.SaveChanges();
+
+            return changeSuccessWorkTimeRange;
         }
     }
 }

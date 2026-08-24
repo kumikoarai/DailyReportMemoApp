@@ -30,13 +30,10 @@ namespace DailyReportMemoApp.Repositories
         /// 案件を追加するメソッド
         /// </summary>
         /// <param name="project"></param>
-        public Project AddProject(Project project)
+        public Project AddProject(AppDbContext db, Project project)
         {
-            using (var db = new AppDbContext())
-            {
-                db.Projects.Add(project);
-                db.SaveChanges();
-            }
+            db.Projects.Add(project);
+            db.SaveChanges();
             return project;
         }
 

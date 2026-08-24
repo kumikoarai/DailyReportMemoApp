@@ -71,22 +71,19 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="workingOn"></param>
         /// <returns></returns>
-        public bool WorkingOnLogCompleted(WorkingOn workingOn)
+        public bool WorkingOnLogCompleted(AppDbContext db, WorkingOn workingOn)
         { 
-            using (var db = new Data.AppDbContext())
+            var existingWorkingOnLog = db.WorkingOnLogs.Find(workingOn.WorkingOnId);
+            if (existingWorkingOnLog == null)
             {
-                var existingWorkingOnLog = db.WorkingOnLogs.Find(workingOn.WorkingOnId);
-                if (existingWorkingOnLog == null)
-                {
-                    return false;
-                }
-
-                var now = DateTime.Now;
-                existingWorkingOnLog.WorkingOnFlg = false;
-                existingWorkingOnLog.WorkingOnEnd = now;
-                existingWorkingOnLog.UpdatedAt = now;
-                db.SaveChanges();
+                return false;
             }
+
+            var now = DateTime.Now;
+            existingWorkingOnLog.WorkingOnFlg = false;
+            existingWorkingOnLog.WorkingOnEnd = now;
+            existingWorkingOnLog.UpdatedAt = now;
+            db.SaveChanges();
             return true;
         }
     }

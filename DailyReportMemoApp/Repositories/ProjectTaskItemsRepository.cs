@@ -59,13 +59,10 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="projectTaskItem"></param>
         /// <returns></returns>
-        public ProjectTaskItem AddProjectTaskItem(ProjectTaskItem projectTaskItem)
+        public ProjectTaskItem AddProjectTaskItem(AppDbContext db, ProjectTaskItem projectTaskItem)
         {
-            using (var db = new AppDbContext())
-            {
-                db.ProjectTaskItems.Add(projectTaskItem);
-                db.SaveChanges();
-            }
+            db.ProjectTaskItems.Add(projectTaskItem);
+            db.SaveChanges();
 
             return projectTaskItem;
         }
@@ -75,47 +72,40 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="ProjectTaskItemId"></param>
         /// <returns></returns>
-        public bool UpdateProjectTaskItemIsCurrent(int? ProjectTaskItemId)
+        public bool UpdateProjectTaskItemIsCurrent(AppDbContext db, int? ProjectTaskItemId)
         {
-            using (var db = new AppDbContext())
+            var existingProjectTaskItem = db.ProjectTaskItems.Find(ProjectTaskItemId);
+            if (existingProjectTaskItem == null)
             {
+                return false;
+            }
 
-                var existingProjectTaskItem = db.ProjectTaskItems.Find(ProjectTaskItemId);
-                if (existingProjectTaskItem == null)
-                {
-                    return false;
-                }
+            var now = DateTime.Now;
+            existingProjectTaskItem.IsCurrent = true;
+            existingProjectTaskItem.UpdatedAt = now;
+            db.SaveChanges();
 
-                var now = DateTime.Now;
-                existingProjectTaskItem.IsCurrent = true;
-                existingProjectTaskItem.UpdatedAt = now;
-                db.SaveChanges();
-
-                return true;
-            };
+            return true;
         }
 
         /// <summary>
         /// 案件作業項目の全ての本日対応フラグをfalseに更新
         /// </summary>
         /// <returns></returns>
-        public bool UpdateProjectTaskItemIsNotCurrent()
+        public bool UpdateProjectTaskItemIsNotCurrent(AppDbContext db)
         {
-            using (var db = new AppDbContext())
+            var curProjectTaskItems = db.ProjectTaskItems
+                                        .Where(cp => cp.IsCurrent)
+                                        .ToList();
+
+            foreach (var curProjectTaskItem in curProjectTaskItems)
             {
-                var curProjectTaskItems = db.ProjectTaskItems
-                                            .Where(cp => cp.IsCurrent)
-                                            .ToList();
-
-                foreach (var curProjectTaskItem in curProjectTaskItems)
-                {
-                    curProjectTaskItem.IsCurrent = false;
-                    curProjectTaskItem.UpdatedAt = DateTime.Now;
-                    db.SaveChanges();
-                }
-
-                return true;
+                curProjectTaskItem.IsCurrent = false;
+                curProjectTaskItem.UpdatedAt = DateTime.Now;
+                db.SaveChanges();
             }
+
+            return true;
         }
     }
 }

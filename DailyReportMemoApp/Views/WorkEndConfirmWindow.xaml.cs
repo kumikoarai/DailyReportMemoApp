@@ -1,6 +1,9 @@
-﻿using DailyReportMemoApp.Models;
+﻿using DailyReportMemoApp.Data;
+using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Utils;
 using DailyReportMemoApp.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -282,45 +285,66 @@ namespace DailyReportMemoApp.Views
                 return;
             }
 
-            //案件作業項目の全ての本日対応フラグをfalseに更新
-            _projectTaskItemsRepository.UpdateProjectTaskItemIsNotCurrent();
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            var workLogsList = _workLogsRepository.GetSimpleWorkLogs(_workingOnLogs.WorkingOnId);
-
-
-            foreach (var workLog in workLogsList)
+            try
             {
-                foreach (var w_workTimeRange in workLog.WorkTimeRanges)
+                //案件作業項目の全ての本日対応フラグをfalseに更新
+                _projectTaskItemsRepository.UpdateProjectTaskItemIsNotCurrent(db);
+
+                var workLogsList = _workLogsRepository.GetSimpleWorkLogs(_workingOnLogs.WorkingOnId);
+
+
+                foreach (var workLog in workLogsList)
                 {
-                    // 他の作業が作業中の場合
-                    if (w_workTimeRange.EndTime == null)
+                    foreach (var w_workTimeRange in workLog.WorkTimeRanges)
                     {
-                        var updateEndTimeResult = _workTimeRangesRepository.UpdateWorkTimeRangeEndTime(w_workTimeRange, _now, _TodayEndWorkTime);
-                        if (!updateEndTimeResult)
+                        // 他の作業が作業中の場合
+                        if (w_workTimeRange.EndTime == null)
                         {
-                            MessageBox.Show("タスク終了時間の更新に失敗しました。");
-                            return;
+                            var updateEndTimeResult = _workTimeRangesRepository.UpdateWorkTimeRangeEndTime(db, w_workTimeRange, _now, _TodayEndWorkTime);
+                            if (!updateEndTimeResult)
+                            {
+                                MessageBox.Show("タスク終了時間の更新に失敗しました。");
+                                return;
+                            }
+                        }
+
+                        //案件作業項目の対応中フラグを更新
+                        if (w_workTimeRange.StartTime != null)
+                        {
+                            _projectTaskItemsRepository.UpdateProjectTaskItemIsCurrent(db, workLog.ProjectTaskItemId);
                         }
                     }
-
-                    //案件作業項目の対応中フラグを更新
-                    if (w_workTimeRange.StartTime != null)
-                    {
-                        _projectTaskItemsRepository.UpdateProjectTaskItemIsCurrent(workLog.ProjectTaskItemId);
-                    }
                 }
-            }
 
-            var updateResult = _workingOnRepository.WorkingOnLogCompleted(_workingOnLogs);
-            if (!updateResult)
+                var updateResult = _workingOnRepository.WorkingOnLogCompleted(db, _workingOnLogs);
+
+                if (!updateResult)
+                {
+                    MessageBox.Show("本日の作業ログが見つかりませんでした。");
+                    return;
+                }
+
+                transaction.Commit();
+
+                DialogResult = true;
+
+            }
+            catch (DbUpdateException ex)
             {
-                MessageBox.Show("作業中のタスクの終了に失敗しました。");
-                return;
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "本日の作業完了データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
             }
-            //MessageBox.Show("作業中のタスクを終了しました。");
-
-
-            DialogResult = true;
         }
 
         /// <summary>

@@ -84,13 +84,10 @@ namespace DailyReportMemoApp.Repositories
         /// 会社案件を追加するメソッド
         /// </summary>
         /// <param name="companyProject"></param>
-        public CompanyProject AddCompanyProject(CompanyProject companyProject)
+        public CompanyProject AddCompanyProject(AppDbContext db, CompanyProject companyProject)
         {
-            using (var db = new AppDbContext())
-            {
                 db.CompanyProjects.Add(companyProject);
                 db.SaveChanges();
-            }
             return companyProject;
         }
 

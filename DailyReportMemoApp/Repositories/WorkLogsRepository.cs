@@ -230,13 +230,10 @@ namespace DailyReportMemoApp.Repositories
         /// </summary>
         /// <param name="workLog"></param>
         /// <returns></returns>
-        public WorkLog AddWorkLog(WorkLog workLog)
+        public WorkLog AddWorkLog(AppDbContext db, WorkLog workLog)
         {
-            using (var db = new Data.AppDbContext())
-            {
-                db.WorkLogs.Add(workLog);
-                db.SaveChanges();
-            }
+            db.WorkLogs.Add(workLog);
+            db.SaveChanges();
             return workLog;
         }
 

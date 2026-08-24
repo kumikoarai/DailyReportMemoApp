@@ -1,6 +1,7 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Utils;
 using DailyReportMemoApp.ViewModels;
 using DailyReportMemoApp.Views;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,7 @@ namespace DailyReportMemoApp
             // 作業中のタスクが存在しない場合、本日の作業中の記録を開始する
             if (_workingOnLogs == null)
             {
-                WorkingOn newWorkingOn = WorkingOnRecordingStarted();
+                WorkingOn? newWorkingOn = WorkingOnRecordingStarted();
                 _workingOnLogs = newWorkingOn;
 
                 nonToday = true;
@@ -92,41 +93,62 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            var specialTasks = _specialTasksRepository.GetSpecialTasks();
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            if (todayWorkLogs.Count <= 0)
+            try
             {
-                // 今日の作業ログが存在しない場合、特別作業項目の作業ログを新規作成する
-                for (var st = 0; st < specialTasks.Count; st++)
-                {
-                    var specialTask = specialTasks[st];
+                var specialTasks = _specialTasksRepository.GetSpecialTasks();
 
-                    var workLog = new WorkLog
-                    {
-                        SpecialTaskId = specialTask.SpecialTaskId,
-                        WorkingOnId = _workingOnLogs.WorkingOnId,
-                        CreatedAt = DateTime.Now
-                    };
-                    _workLogsRepository.AddWorkLog(workLog);
-                }
-            }
-            else
-            {
-                // 今日の作業ログが存在する場合、特別作業項目の作業ログが存在しない場合は新しい作業ログを作成する
-                foreach (var specialTask in specialTasks)
+                if (todayWorkLogs.Count <= 0)
                 {
-                    var existingWorkLog = todayWorkLogs.FirstOrDefault(wl => wl.SpecialTaskId == specialTask.SpecialTaskId);
-                    if (existingWorkLog == null)
+                    // 今日の作業ログが存在しない場合、特別作業項目の作業ログを新規作成する
+                    for (var st = 0; st < specialTasks.Count; st++)
                     {
-                        var newWorkLog = new WorkLog
+                        var specialTask = specialTasks[st];
+
+                        var workLog = new WorkLog
                         {
                             SpecialTaskId = specialTask.SpecialTaskId,
                             WorkingOnId = _workingOnLogs.WorkingOnId,
                             CreatedAt = DateTime.Now
                         };
-                        _workLogsRepository.AddWorkLog(newWorkLog);
+                        _workLogsRepository.AddWorkLog(db,workLog);
                     }
                 }
+                else
+                {
+                    // 今日の作業ログが存在する場合、特別作業項目の作業ログが存在しない場合は新しい作業ログを作成する
+                    foreach (var specialTask in specialTasks)
+                    {
+                        var existingWorkLog = todayWorkLogs.FirstOrDefault(wl => wl.SpecialTaskId == specialTask.SpecialTaskId);
+                        if (existingWorkLog == null)
+                        {
+                            var newWorkLog = new WorkLog
+                            {
+                                SpecialTaskId = specialTask.SpecialTaskId,
+                                WorkingOnId = _workingOnLogs.WorkingOnId,
+                                CreatedAt = DateTime.Now
+                            };
+                            _workLogsRepository.AddWorkLog(db, newWorkLog);
+                        }
+                    }
+                }
+
+                transaction.Commit();
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "特別作業項目の作業ログデータの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
             }
         }
 
@@ -141,41 +163,63 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            var currentProjectTasks = _projectTaskItemsRepository.GetCurrentProjectTaskItems();
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            if (todayWorkLogs.Count <= 0)
+            try
             {
-                // 今日の作業ログが存在しない場合、案件作業項目の作業ログを新規作成する
-                for (var pt = 0; pt < currentProjectTasks.Count; pt++)
-                {
-                    var currentProjectTask = currentProjectTasks[pt];
+                var currentProjectTasks = _projectTaskItemsRepository.GetCurrentProjectTaskItems();
 
-                    var workLog = new WorkLog
-                    {
-                        ProjectTaskItemId = currentProjectTask.ProjectTaskItemId,
-                        WorkingOnId = _workingOnLogs.WorkingOnId,
-                        CreatedAt = DateTime.Now
-                    };
-                    _workLogsRepository.AddWorkLog(workLog);
-                }
-            }
-            else
-            {
-                // 今日の作業ログが存在する場合、案件作業項目の作業ログが存在しない場合は新しい作業ログを作成する
-                foreach (var currentProjectTask in currentProjectTasks)
+                if (todayWorkLogs.Count <= 0)
                 {
-                    var existingWorkLog = todayWorkLogs.FirstOrDefault(wl => wl.ProjectTaskItemId == currentProjectTask.ProjectTaskItemId);
-                    if (existingWorkLog == null)
+                    // 今日の作業ログが存在しない場合、案件作業項目の作業ログを新規作成する
+                    for (var pt = 0; pt < currentProjectTasks.Count; pt++)
                     {
-                        var newWorkLog = new WorkLog
+                        var currentProjectTask = currentProjectTasks[pt];
+
+                        var workLog = new WorkLog
                         {
                             ProjectTaskItemId = currentProjectTask.ProjectTaskItemId,
                             WorkingOnId = _workingOnLogs.WorkingOnId,
                             CreatedAt = DateTime.Now
                         };
-                        _workLogsRepository.AddWorkLog(newWorkLog);
+                        _workLogsRepository.AddWorkLog(db, workLog);
                     }
                 }
+                else
+                {
+                    // 今日の作業ログが存在する場合、案件作業項目の作業ログが存在しない場合は新しい作業ログを作成する
+                    foreach (var currentProjectTask in currentProjectTasks)
+                    {
+                        var existingWorkLog = todayWorkLogs.FirstOrDefault(wl => wl.ProjectTaskItemId == currentProjectTask.ProjectTaskItemId);
+                        if (existingWorkLog == null)
+                        {
+                            var newWorkLog = new WorkLog
+                            {
+                                ProjectTaskItemId = currentProjectTask.ProjectTaskItemId,
+                                WorkingOnId = _workingOnLogs.WorkingOnId,
+                                CreatedAt = DateTime.Now
+                            };
+                            _workLogsRepository.AddWorkLog(db, newWorkLog);
+                        }
+                    }
+                }
+
+                transaction.Commit();
+
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "案件作業項目の作業ログデータの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
             }
         }
 
@@ -183,19 +227,34 @@ namespace DailyReportMemoApp
         /// <summary>
         /// 本日の作業の記録を開始するメソッド
         /// </summary>
-        private WorkingOn WorkingOnRecordingStarted()
+        private WorkingOn? WorkingOnRecordingStarted()
         {
             var now = DateTime.Now;
 
-            var workingOn = new WorkingOn
+            try
             {
-                WorkingOnFlg = true,
-                WorkDate = DateOnly.FromDateTime(now),
-                WorkingOnStart = now,
-                CreatedAt = now
-            };
+                var workingOn = new WorkingOn
+                {
+                    WorkingOnFlg = true,
+                    WorkDate = DateOnly.FromDateTime(now),
+                    WorkingOnStart = now,
+                    CreatedAt = now
+                };
 
-            return _workingOnRepository.AddWorkingOn(workingOn);
+                return _workingOnRepository.AddWorkingOn(workingOn);
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                MessageBox.Show(
+                    "本日の作業データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                return null;
+            }
         }
 
 
@@ -698,38 +757,60 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            var workLogsList = _workLogsRepository.GetSimpleWorkLogs(_workingOnLogs.WorkingOnId);
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            var now = DateTime.Now;
-
-            TimeSpan nowTime = Common.workTimeSpan(now, _workingOnLogs);
-
-            foreach (var workLog in workLogsList)
+            try
             {
-                foreach (var w_workTimeRange in workLog.WorkTimeRanges)
+                var workLogsList = _workLogsRepository.GetSimpleWorkLogs(_workingOnLogs.WorkingOnId);
+
+                var now = DateTime.Now;
+
+                TimeSpan nowTime = Common.workTimeSpan(now, _workingOnLogs);
+
+                foreach (var workLog in workLogsList)
                 {
-                    // 他の作業が作業中の場合
-                    if (w_workTimeRange.EndTime == null)
+                    foreach (var w_workTimeRange in workLog.WorkTimeRanges)
                     {
-                        var updateResult = _workTimeRangesRepository.UpdateWorkTimeRangeEndTime(w_workTimeRange, now, nowTime);
-                        if(!updateResult)
+                        // 他の作業が作業中の場合
+                        if (w_workTimeRange.EndTime == null)
                         {
-                            MessageBox.Show("タスク終了時間の更新に失敗しました。");
-                            return;
+                            var updateResult = _workTimeRangesRepository.UpdateWorkTimeRangeEndTime(db, w_workTimeRange, now, nowTime);
+                            if (!updateResult)
+                            {
+                                MessageBox.Show("タスク終了時間の更新に失敗しました。");
+                                return;
+                            }
                         }
                     }
                 }
+
+                var newWorkTimeRange = new WorkTimeRange
+                {
+                    WorkLogId = tagWorkLog.WorkLogId,
+                    StartTime = nowTime,
+                    CreatedAt = now
+                };
+                _workTimeRangesRepository.AddWorkTimeRange(db, newWorkTimeRange);
+
+                transaction.Commit();
+
+                LoadTasks();
+
             }
-
-            var newWorkTimeRange = new WorkTimeRange
+            catch (DbUpdateException ex)
             {
-                WorkLogId = tagWorkLog.WorkLogId,
-                StartTime = nowTime,
-                CreatedAt = now
-            };
-            _workTimeRangesRepository.AddWorkTimeRange(newWorkTimeRange);
+                ErrorLogger.Write(ex);
 
-            LoadTasks();
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "タスク終了時間の更新と、作業時間範囲の保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+            }
         }
 
 
@@ -747,16 +828,36 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            //会社案件のメモを更新
-            var rsltSaveInfo = _companyProjectsRepository.UpdateCompanyProjectMemo(saveInfo);
-
-            if (rsltSaveInfo == null)
+            try
             {
-                return;
-            }
-            saveInfo = rsltSaveInfo;
+                //会社案件のメモを更新
+                var rsltSaveInfo = _companyProjectsRepository.UpdateCompanyProjectMemo(saveInfo);
 
-            MessageBox.Show("メモを保存しました。");
+                if (rsltSaveInfo == null)
+                {
+                    MessageBox.Show(
+                        "更新対象の案件が見つかりませんでした。",
+                        "エラー",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    return;
+                }
+                saveInfo = rsltSaveInfo;
+
+                MessageBox.Show("メモを保存しました。");
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                MessageBox.Show(
+                    "案件のメモの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+            }
         }
 
 
@@ -875,112 +976,118 @@ namespace DailyReportMemoApp
                 newTime = timeTextBox.Text.Trim();
             }
 
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            if (string.IsNullOrWhiteSpace(newTime) || timeTextBox == null)
+            try
             {
-                if (workTime.Sagyochu)
+                if (string.IsNullOrWhiteSpace(newTime) || timeTextBox == null)
                 {
-                    MessageBoxResult result = MessageBox.Show(
-                        "作業時間を削除します。\nよろしいですか？",
-                        "作業時間削除の確認",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-
-                    if (result == MessageBoxResult.No)
+                    if (workTime.Sagyochu)
                     {
-                        return;
-                    }
-                    if (!_workTimeRangesRepository.DeleteWorkTimeRange(workTime.WorkTimeRange.WorkTimeRangeId))
-                    {
-                        MessageBox.Show("作業範囲の削除に失敗しました。");
-                        return;
-                    }
+                        MessageBoxResult result = MessageBox.Show(
+                            "作業時間を削除します。\nよろしいですか？",
+                            "作業時間削除の確認",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question);
 
-                    if (!_workTimeRangesRepository.UpdateWorkTimeRangeTimeEndTimeDel(workTime.WorkTimeRange, _workingOnLogs.WorkingOnId))
-                    {
-                        MessageBox.Show("作業範囲の削除に失敗しました。");
-                        return;
-                    }
+                        if (result == MessageBoxResult.No)
+                        {
+                            return;
+                        }
+                        if (!_workTimeRangesRepository.DeleteWorkTimeRange(db, workTime.WorkTimeRange.WorkTimeRangeId))
+                        {
+                            MessageBox.Show("作業範囲の削除に失敗しました。");
+                            return;
+                        }
 
+                        if (!_workTimeRangesRepository.UpdateWorkTimeRangeTimeEndTimeDel(db, workTime.WorkTimeRange, _workingOnLogs.WorkingOnId))
+                        {
+                            MessageBox.Show("作業範囲の削除に失敗しました。");
+                            return;
+                        }
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("作業時間が入力されていません。");
+
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("作業時間が入力されていません。");
 
+                    // newTimeが全角文字や記号や数字を含む場合、半角に変換する
+                    newTime = newTime.Replace("：", ":").Replace("０", "0").Replace("１", "1").Replace("２", "2")
+                                     .Replace("３", "3").Replace("４", "4").Replace("５", "5").Replace("６", "6")
+                                     .Replace("７", "7").Replace("８", "8").Replace("９", "9");
+
+
+                    // newTimeが数字以外の文字を含む場合、エラーメッセージを表示して処理を終了する
+
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(newTime, @"^\d{1,2}:\d{2}$"))
+                    {
+                        MessageBox.Show("作業時間の形式が正しくありません。HH:mm形式で入力してください。");
+                        return;
+                    }
+
+                    // newTimeが開始時間よりも終了時間が早い場合、エラーメッセージを表示して処理を終了する
+                    if (workTime.StartOrEnd == "end" && workTime.WorkTimeRange.StartTime != null)
+                    {
+                        bool rslt = _common.TryParseTime(newTime, out TimeSpan parsedNewTime1);
+                        var startTime = workTime.WorkTimeRange.StartTime.Value;
+                        var endTime = parsedNewTime1;
+                        if (endTime < startTime)
+                        {
+                            MessageBox.Show("終了時間は開始時間よりも後に設定してください。");
+                            return;
+                        }
+                    }
+                    else if (workTime.StartOrEnd == "start" && workTime.WorkTimeRange.EndTime != null)
+                    {
+                        var startTime = TimeSpan.Parse(newTime);
+                        var endTime = workTime.WorkTimeRange.EndTime.Value;
+                        if (startTime > endTime)
+                        {
+                            MessageBox.Show("開始時間は終了時間よりも前に設定してください。");
+                            return;
+                        }
+                    }
+
+                    // バリデーションチェック
+                    if (!_common.TryParseTime(newTime, out TimeSpan parsedNewTime2))
+                    {
+                        MessageBox.Show("作業時間の形式が正しくありません。HH:mm形式で入力してください。");
+                        return;
+                    }
+
+
+                    _changeWorkTimeRange = _workTimeRangesRepository.UpdateWorkTimeRangeTime(db, workTime, newTime, _workingOnLogs.WorkingOnId);
+
+                    //作業時間の更新に失敗した場合、エラーメッセージを表示する
+                    if (_changeWorkTimeRange.SuccessOrFailure == "f")
+                    {
+                        MessageBox.Show("作業時間の更新に失敗しました。");
+
+                        return;
+                    }
                 }
+
+                transaction.Commit();
+
             }
-            else
+            catch (DbUpdateException ex)
             {
+                ErrorLogger.Write(ex);
 
-                // newTimeが全角文字や記号や数字を含む場合、半角に変換する
-                newTime = newTime.Replace("：", ":").Replace("０", "0").Replace("１", "1").Replace("２", "2")
-                                 .Replace("３", "3").Replace("４", "4").Replace("５", "5").Replace("６", "6")
-                                 .Replace("７", "7").Replace("８", "8").Replace("９", "9");
+                transaction.Rollback();
 
+                MessageBox.Show(
+                    "作業時間の削除と更新に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
 
-                // newTimeが数字以外の文字を含む場合、エラーメッセージを表示して処理を終了する
-
-                if (!System.Text.RegularExpressions.Regex.IsMatch(newTime, @"^\d{1,2}:\d{2}$"))
-                {
-                    MessageBox.Show("作業時間の形式が正しくありません。HH:mm形式で入力してください。");
-                    return;
-                }
-
-                //// newTimeが24時間表記の範囲外の場合、エラーメッセージを表示して処理を終了する
-                //if (timeTextBox != null)
-                //{
-                //    var timeParts = newTime.Split(':');
-                //    if (timeParts.Length != 2 ||
-                //        !int.TryParse(timeParts[0], out int hours) ||
-                //        !int.TryParse(timeParts[1], out int minutes) ||
-                //        hours < 0 || hours > 23 ||
-                //        minutes < 0 || minutes > 59)
-                //    {
-                //        MessageBox.Show("作業時間の形式が正しくありません。HH:mm形式で入力してください。");
-                //        return;
-                //    }
-                //}
-
-                // newTimeが開始時間よりも終了時間が早い場合、エラーメッセージを表示して処理を終了する
-                if (workTime.StartOrEnd == "end" && workTime.WorkTimeRange.StartTime != null)
-                {
-                    bool rslt = _common.TryParseTime(newTime, out TimeSpan parsedNewTime1);
-                    var startTime = workTime.WorkTimeRange.StartTime.Value;
-                    var endTime = parsedNewTime1;
-                    if (endTime < startTime)
-                    {
-                        MessageBox.Show("終了時間は開始時間よりも後に設定してください。");
-                        return;
-                    }
-                }
-                else if (workTime.StartOrEnd == "start" && workTime.WorkTimeRange.EndTime != null)
-                {
-                    var startTime = TimeSpan.Parse(newTime);
-                    var endTime = workTime.WorkTimeRange.EndTime.Value;
-                    if (startTime > endTime)
-                    {
-                        MessageBox.Show("開始時間は終了時間よりも前に設定してください。");
-                        return;
-                    }
-                }
-
-                // バリデーションチェック
-                if (!_common.TryParseTime(newTime, out TimeSpan parsedNewTime2))
-                {
-                    MessageBox.Show("作業時間の形式が正しくありません。HH:mm形式で入力してください。");
-                    return;
-                }
-
-
-                _changeWorkTimeRange = _workTimeRangesRepository.UpdateWorkTimeRangeTime(workTime, newTime, _workingOnLogs.WorkingOnId);
-
-                //作業時間の更新に失敗した場合、エラーメッセージを表示する
-                if (_changeWorkTimeRange.SuccessOrFailure == "f")
-                {
-                    MessageBox.Show("作業時間の更新に失敗しました。");
-
-                    return;
-                }
             }
 
 

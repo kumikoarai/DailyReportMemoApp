@@ -1,6 +1,8 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,15 +88,27 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            var company = new Company
+            try
             {
-                CompanyName = companyName,
-                CreatedAt = DateTime.Now
-            };
-            _companiesRepository.AddCompany(company);
+                var company = new Company
+                {
+                    CompanyName = companyName,
+                    CreatedAt = DateTime.Now
+                };
+                _companiesRepository.AddCompany(company);
 
-            LoadCompanies();
-            CompanyName.Text = "";
+                LoadCompanies();
+                CompanyName.Text = "";
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+                MessageBox.Show(
+                    "会社データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -120,9 +134,11 @@ namespace DailyReportMemoApp
                 MessageBox.Show("会社を選択してください。");
                 return;
             }
-            else
-            {
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
+            try
+            {
                 // 会社に関連する案件を追加する
                 var project = new Project
                 {
@@ -130,7 +146,7 @@ namespace DailyReportMemoApp
                     Completed = false,
                     CreatedAt = DateTime.Now
                 };
-                var newProject = _projectsRepository.AddProject(project);
+                var newProject = _projectsRepository.AddProject(db, project);
 
                 // 会社と案件の関連を追加する
                 var companyProject = new CompanyProject
@@ -139,11 +155,29 @@ namespace DailyReportMemoApp
                     ProjectId = newProject.ProjectId,
                     CreatedAt = DateTime.Now
                 };
-                _companyProjectsRepository.AddCompanyProject(companyProject);
+                _companyProjectsRepository.AddCompanyProject(db, companyProject);
+
+                transaction.Commit();
+
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "会社・案件データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                return;
             }
 
             LoadCompanyProjects(selectedCompany.CompanyId);
             ProjectName.Text = "";
+
         }
 
         /// <summary>
@@ -175,27 +209,49 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            // 選択された案件に関連する作業を追加する
-            var taskItem = new TaskItem
-            {
-                TaskItemName = taskItemName,
-                CreatedAt = DateTime.Now
-            };
-            var newTaskItem = _taskItemsRepository.AddTaskItem(taskItem);
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
 
-            // 案件と作業の関連を追加する
-            var projectTaskItem = new ProjectTaskItem
+            try
             {
-                CompanyProjectId = selectedProject.CompanyProjectId,
-                TaskItemId = newTaskItem.TaskItemId,
-                IsCurrent = false,
-                CreatedAt = DateTime.Now
-            };
-            _projectTaskItemsRepository.AddProjectTaskItem(projectTaskItem);
+                // 選択された案件に関連する作業を追加する
+                var taskItem = new TaskItem
+                {
+                    TaskItemName = taskItemName,
+                    CreatedAt = DateTime.Now
+                };
+                var newTaskItem = _taskItemsRepository.AddTaskItem(db, taskItem);
 
-            // 選択された案件に関連する作業のリストを更新する
-            LoadProjectTaskItems(selectedProject.CompanyProjectId);
-            TaskItemName.Text = "";
+                // 案件と作業の関連を追加する
+                var projectTaskItem = new ProjectTaskItem
+                {
+                    CompanyProjectId = selectedProject.CompanyProjectId,
+                    TaskItemId = newTaskItem.TaskItemId,
+                    IsCurrent = false,
+                    CreatedAt = DateTime.Now
+                };
+                _projectTaskItemsRepository.AddProjectTaskItem(db, projectTaskItem);
+
+                transaction.Commit();
+
+                // 選択された案件に関連する作業のリストを更新する
+                LoadProjectTaskItems(selectedProject.CompanyProjectId);
+                TaskItemName.Text = "";
+
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "会社・案件・作業データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+            }
         }
 
         /// <summary>
@@ -278,10 +334,12 @@ namespace DailyReportMemoApp
             {
                 return;
             }
-            else
+
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
+
+            try
             {
-
-
                 // 選択された作業に関連する作業ログを追加する
                 if (_workingOnLogs != null)
                 {
@@ -299,8 +357,10 @@ namespace DailyReportMemoApp
                         WorkingOnId = _workingOnLogs.WorkingOnId,
                         CreatedAt = DateTime.Now
                     };
-                    _workLogsRepository.AddWorkLog(workLog);
+                    _workLogsRepository.AddWorkLog(db, workLog);
                 }
+
+                transaction.Commit();
 
                 // 選択された作業をプロパティに設定する
                 _projectTaskItem = selectedTaskItem;
@@ -308,7 +368,19 @@ namespace DailyReportMemoApp
                 DialogResult = true;
                 Close();
             }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
 
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "作業ログデータの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+            }
         }
     }
 }
