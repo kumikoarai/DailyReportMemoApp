@@ -155,6 +155,8 @@ namespace DailyReportMemoApp.Views
 
                 transaction.Commit();
 
+                LoadProjects();
+                ProjectName.Text = "";
             }
             catch (DbUpdateException ex)
             {
@@ -171,8 +173,6 @@ namespace DailyReportMemoApp.Views
                 return;
             }
 
-            LoadProjects();
-            ProjectName.Text = "";
         }
 
 

@@ -16,17 +16,20 @@
         <!-- 上部メニュー -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="作業">
-                <MenuItem Header="開始"/>
-                <MenuItem Header="終了"/>
+                <MenuItem Header="開始"
+                          Click="OpenWorkEntryWindow_Click"/>
             </MenuItem>
 
             <MenuItem Header="管理">
-                <MenuItem Header="デフォルト作業設定"/>
-                <MenuItem Header="一括案件管理"/>
+                <MenuItem Header="デフォルト作業設定"
+                          Click="OpenSpecialTasksEntryWindow_Click"/>
+                <MenuItem Header="一括案件管理"
+                          Click="OpenProjectManagementWindow_Click"/>
             </MenuItem>
 
             <MenuItem Header="表示">
-                <MenuItem Header="過去作業ログ"/>
+                <MenuItem Header="過去作業ログ"
+                          Click="OpenPastWorkLogsWindow_Click"/>
             </MenuItem>
 
             <MenuItem Header="ヘルプ">

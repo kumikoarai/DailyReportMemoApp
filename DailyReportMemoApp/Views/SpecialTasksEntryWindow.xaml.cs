@@ -1,11 +1,14 @@
 ﻿using DailyReportMemoApp.Data;
 using DailyReportMemoApp.Models;
+using DailyReportMemoApp.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -41,22 +44,37 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            using (var db = new AppDbContext())
+            try
             {
-                var specialTask = new SpecialTask
+                using (var db = new AppDbContext())
                 {
-                    SpecialTaskName = specialTaskName,
-                    DefaultStartFlg = false,
-                    CreatedAt = DateTime.Now
-                };
+                    var specialTask = new SpecialTask
+                    {
+                        SpecialTaskName = specialTaskName,
+                        DefaultStartFlg = false,
+                        CreatedAt = DateTime.Now
+                    };
 
-                db.SpecialTasks.Add(specialTask);
-                db.SaveChanges();
+                    db.SpecialTasks.Add(specialTask);
+                    db.SaveChanges();
+                }
+
+                LoadSpecialTasks();
+
+                SpecialTaskName.Text = "";
             }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
 
-            LoadSpecialTasks();
+                MessageBox.Show(
+                    "特別作業項目名データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
 
-            SpecialTaskName.Text = "";
+                return;
+            }
         }
 
         /// <summary>
@@ -273,7 +291,9 @@ namespace DailyReportMemoApp
                 return;
             }
 
-            using (var db = new AppDbContext())
+            using var db = new AppDbContext();
+            using var transaction = db.Database.BeginTransaction();
+            try
             {
                 var specialTasks = db.SpecialTasks.ToList();
                 var now = DateTime.Now;
@@ -292,6 +312,20 @@ namespace DailyReportMemoApp
                 }
 
                 db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+
+                transaction.Rollback();
+
+                MessageBox.Show(
+                    "ラジオボタン押下時のデータの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                return;
             }
         }
 

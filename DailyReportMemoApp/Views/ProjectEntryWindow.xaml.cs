@@ -375,7 +375,7 @@ namespace DailyReportMemoApp
                 transaction.Rollback();
 
                 MessageBox.Show(
-                    "作業ログデータの保存に失敗しました。",
+                    "案件作業データの保存に失敗しました。",
                     "エラー",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

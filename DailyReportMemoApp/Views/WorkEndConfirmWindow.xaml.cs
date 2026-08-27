@@ -35,13 +35,13 @@ namespace DailyReportMemoApp.Views
         private TimeSpan _TodayEndWorkTime = new TimeSpan(23, 59, 59);
         private DateTime _now;
 
-        public WorkEndConfirmWindow(WorkingOn workingOn)
+        public WorkEndConfirmWindow(WorkingOn? workingOn)
         {
             InitializeComponent();
 
             _workingOnLogs = workingOn;
 
-            TodayDate.Text = _workingOnLogs.WorkDate.ToString("yyyy年MM月dd日");
+            TodayDate.Text = _workingOnLogs?.WorkDate.ToString("yyyy年MM月dd日");
 
             _now = DateTime.Now;
 

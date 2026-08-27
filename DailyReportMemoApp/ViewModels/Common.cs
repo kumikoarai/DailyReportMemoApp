@@ -14,7 +14,7 @@ namespace DailyReportMemoApp.ViewModels
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        public static TimeSpan workTimeSpan(DateTime now, WorkingOn workingOnLogs)
+        public static TimeSpan workTimeSpan(DateTime now, WorkingOn? workingOnLogs)
         {
             DateOnly today = DateOnly.FromDateTime(now);
             int hour = now.Hour;

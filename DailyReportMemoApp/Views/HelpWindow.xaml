@@ -1,0 +1,34 @@
+﻿<Window x:Class="DailyReportMemoApp.Views.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DailyReportMemoApp.Views"
+        mc:Ignorable="d"
+        Title="ヘルプ" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- 左側メニュー -->
+        <ScrollViewer Grid.Row="0"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="BtnListPanel" />
+        </ScrollViewer>
+
+        <!-- 右側 -->
+        <ContentControl Grid.Column="1"
+                Content="{Binding SelectedHelpContent}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <!-- ヘルプ本文 -->
+                    </ScrollViewer>
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
+    </Grid>
+</Window>

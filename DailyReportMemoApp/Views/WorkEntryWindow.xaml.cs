@@ -474,20 +474,6 @@ namespace DailyReportMemoApp
 
                     }
 
-                    //var editButton = new Button
-                    //{
-                    //    Content = "修正",
-                    //    Margin = new Thickness(10, 0, 0, 0),
-                    //    Padding = new Thickness(8, 2, 8, 2),
-
-                    //    // 押された時間帯を特定するため、IDを保持
-                    //    Tag = workTimeRange.WorkTimeRangeId
-                    //};
-                    //editButton.Click += WorkTimeRangeEdit_Click;
-
-                    // 作業時間帯の表示
-                    //timeRowPanel.Children.Add(editButton);
-
                     // 作業時間帯のWrapPanelに追加
                     timeRowPanelWrap.Children.Add(timeRowPanel);
                 }
@@ -1178,6 +1164,42 @@ namespace DailyReportMemoApp
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+
+        private void OpenSpecialTasksEntryWindow_Click(object sender, RoutedEventArgs e)
+        {
+            SpecialTasksEntryWindow specialTasksEntryWindow = new()
+            {
+                Owner = this
+            };
+
+            specialTasksEntryWindow.ShowDialog();
+
+        }
+
+
+        private void OpenProjectManagementWindow_Click(object sender, RoutedEventArgs e)
+        {
+            ProjectManagementWindow projectManagementWindow = new()
+            {
+                Owner = this
+            };
+
+            projectManagementWindow.ShowDialog();
+
+        }
+
+
+        private void OpenPastWorkLogsWindow_Click(object sender, RoutedEventArgs e)
+        {
+            PastWorkLogsWindow pastWorkLogsWindow = new()
+            {
+                Owner = this
+            };
+
+            pastWorkLogsWindow.ShowDialog();
+
         }
 
     }
