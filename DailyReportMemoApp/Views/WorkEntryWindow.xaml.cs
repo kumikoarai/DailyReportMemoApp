@@ -1202,6 +1202,17 @@ namespace DailyReportMemoApp
 
         }
 
+        private void OpenHelpWindow_Click(object sender, RoutedEventArgs e)
+        {
+            HelpWindow helpWindow = new()
+            {
+                Owner = this
+            };
+
+            helpWindow.ShowDialog();
+
+        }
+
     }
 
 }

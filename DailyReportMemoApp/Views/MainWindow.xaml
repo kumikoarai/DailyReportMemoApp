@@ -33,6 +33,8 @@
             </MenuItem>
 
             <MenuItem Header="ヘルプ">
+                <MenuItem Header="ヘルプ"
+                          Click="OpenHelpWindow_Click"/>
                 <MenuItem Header="このアプリについて"/>
             </MenuItem>
         </Menu>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DailyReportMemoApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,47 @@ namespace DailyReportMemoApp.Views
     /// </summary>
     public partial class HelpWindow : Window
     {
+        private ScrollViewer? _currentHelpContent;
+
         public HelpWindow()
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// ヘルプメニューボタンの選択が変更されたときの処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HelpMenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+            if (HelpMenuListBox.SelectedItem is not ListBoxItem selectedItem)
+            {
+                return;
+            }
+
+            // 現在表示しているヘルプを非表示
+            if (_currentHelpContent != null)
+            {
+                _currentHelpContent.Visibility = Visibility.Collapsed;
+            }
+
+            //洗濯したヘルプメニューのタグを取得
+            var tag = selectedItem.Tag?.ToString();
+
+            if (tag == null)
+            {
+                return;
+            }
+
+            // 選択されたヘルプを取得
+            if (FindName(tag) is ScrollViewer scrollViewer)
+            {
+                scrollViewer.Visibility = Visibility.Visible;
+                _currentHelpContent = scrollViewer;
+            }
+        }
     }
+
 }

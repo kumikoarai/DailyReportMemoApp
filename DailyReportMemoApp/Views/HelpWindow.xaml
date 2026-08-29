@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DailyReportMemoApp.Views"
         mc:Ignorable="d"
-        Title="ヘルプ" Height="450" Width="800">
+        Title="ヘルプ" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource CommonWindowStyle}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220"/>
@@ -16,19 +18,225 @@
         <ScrollViewer Grid.Row="0"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="BtnListPanel" />
+            <ListBox x:Name="HelpMenuListBox"
+                 Width="200"
+                 BorderThickness="0"
+                 Background="Transparent"
+                 SelectionChanged="HelpMenuListBox_SelectionChanged">
+
+                <ListBoxItem Content="はじめに"
+                    Tag="Introduction"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="基本的な使い方"
+                    Tag="BasicUsage"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="会社・案件・作業"
+                    Tag="AboutItems"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="作業の記録"
+                    Tag="WorkLog"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="特別作業"
+                    Tag="SpecialWork"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="過去作業ログ"
+                    Tag="PastWorkLogs"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="データについて"
+                    Tag="AboutData"
+                    Padding="15,10" />
+
+                <ListBoxItem Content="よくある質問"
+                    Tag="FAQ"
+                    Padding="15,10" />
+            </ListBox>
         </ScrollViewer>
 
         <!-- 右側 -->
-        <ContentControl Grid.Column="1"
-                Content="{Binding SelectedHelpContent}">
-            <ContentControl.ContentTemplate>
-                <DataTemplate>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <!-- ヘルプ本文 -->
-                    </ScrollViewer>
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
-        </ContentControl>
+        <Grid Grid.Column="1"
+            Margin="20">
+
+            <ScrollViewer x:Name="Introduction"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="しごとメモについて"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        しごとメモは、日々の作業内容と作業時間を簡単に記録するためのデスクトップアプリです。
+                        <LineBreak />
+                        会社・案件・作業を登録しておくことで、「今日はどの案件の、どの作業を、何時から何時まで行ったか」を記録できます。
+                        <LineBreak />
+                        初めて使用する場合は、まず会社・案件・作業を登録してください。
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="BasicUsage"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="基本的な使い方"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        STEP 1
+                        <LineBreak />
+                        会社・案件・作業を登録
+                        <LineBreak />
+                        ↓
+                        <LineBreak />
+                        STEP 2
+                        <LineBreak />
+                        今日の作業を選択
+                        <LineBreak />
+                        ↓
+                        <LineBreak />
+                        STEP 3
+                        <LineBreak />
+                        作業時間を記録
+                        <LineBreak />
+                        ↓
+                        <LineBreak />
+                        STEP 4
+                        <LineBreak />
+                        1日の作業を終了
+                        <LineBreak />
+                        ↓
+                        <LineBreak />
+                        STEP 5
+                        <LineBreak />
+                        過去作業ログを確認
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="AboutItems"
+                  VerticalScrollBarVisibility="Auto"
+                  >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="会社・案件・作業"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        作業内容は「会社 → 案件 → 作業」の順で管理します。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="会社"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        作業を行う会社を登録します。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="案件"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        会社に紐づく案件を登録します。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="作業"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        案件で行う具体的な作業内容を登録します。
+                        <LineBreak />
+                        <LineBreak />
+                        (例)
+                        <LineBreak />
+                        <StackPanel>
+                            <TextBlock Text="○○株式会社" />
+                            <TextBlock Text="└ 在庫管理システム"
+                                Margin="20,3,0,0" />
+                            <TextBlock Text="├ プログラム修正"
+                                Margin="40,3,0,0" />
+                            <TextBlock Text="├ テスト"
+                                Margin="40,3,0,0" />
+                            <TextBlock Text="└ 打ち合わせ"
+                                Margin="40,3,0,0" />
+                        </StackPanel>
+                        <LineBreak />
+                        <LineBreak />
+                        登録した会社・案件・作業は、一括案件管理画面から確認できます。
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="WorkLog"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <TextBlock Text="作業の記録"
+                   FontSize="16"
+                   Margin="0,0,0,10" />
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="SpecialWork"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <TextBlock Text="特別作業"
+                   FontSize="16"
+                   Margin="0,0,0,10" />
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="PastWorkLogs"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <TextBlock Text="過去作業ログ"
+                   FontSize="16"
+                   Margin="0,0,0,10" />
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="AboutData"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <TextBlock Text="データについて"
+                   FontSize="16"
+                   Margin="0,0,0,10" />
+            </ScrollViewer>
+
+            <ScrollViewer x:Name="FAQ"
+                  VerticalScrollBarVisibility="Auto"
+                  Visibility="Collapsed">
+                <TextBlock Text="よくある質問"
+                   FontSize="16"
+                   Margin="0,0,0,10" />
+            </ScrollViewer>
+
+        </Grid>
     </Grid>
 </Window>
