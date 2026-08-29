@@ -1,6 +1,8 @@
 ﻿using DailyReportMemoApp.Models;
 using DailyReportMemoApp.Repositories;
+using DailyReportMemoApp.Utils;
 using DailyReportMemoApp.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,6 +140,45 @@ namespace DailyReportMemoApp.Views
         private void CloseProjectManagement_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+
+        /// <summary>
+        /// 会社名を入力して追加するボタンがクリックされたときの処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CompanyEntry_Click(object sender, RoutedEventArgs e)
+        {
+            var companyName = CompanyName.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(companyName))
+            {
+                MessageBox.Show("会社名を入力してください。");
+                return;
+            }
+
+            try
+            {
+                var company = new Company
+                {
+                    CompanyName = companyName,
+                    CreatedAt = DateTime.Now
+                };
+                _companiesRepository.AddCompany(company);
+
+                LoadButtons();
+                CompanyName.Text = "";
+            }
+            catch (DbUpdateException ex)
+            {
+                ErrorLogger.Write(ex);
+                MessageBox.Show(
+                    "会社データの保存に失敗しました。",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
     }

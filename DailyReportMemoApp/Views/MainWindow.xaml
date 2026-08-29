@@ -35,7 +35,8 @@
             <MenuItem Header="ヘルプ">
                 <MenuItem Header="ヘルプ"
                           Click="OpenHelpWindow_Click"/>
-                <MenuItem Header="このアプリについて"/>
+                <MenuItem Header="このアプリについて"
+                          Click="OpenAboutThisApp_Click"/>
             </MenuItem>
         </Menu>
 

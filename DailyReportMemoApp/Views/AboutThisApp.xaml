@@ -1,0 +1,78 @@
+﻿<Window x:Class="DailyReportMemoApp.Views.AboutThisApp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DailyReportMemoApp.Views"
+        mc:Ignorable="d"
+        Title="このアプリについて" Height="470" Width="470"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Border
+        BorderBrush="Gray"
+        BorderThickness="1"
+        Margin="20"
+        Padding="10">
+        <ScrollViewer
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            <TextBlock 
+                FontSize="11"
+                TextWrapping="Wrap">
+                
+                <TextBlock Text="しごとログ"
+                    FontSize="12"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                日々の「何をした？」を、あとから分かる形に。
+                <LineBreak />
+                <LineBreak />
+                Version 1.0.0
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Text="■ このアプリについて"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                しごとログは、日々の作業内容と作業時間を
+                手軽に記録するためのデスクトップアプリです。
+                <LineBreak />
+                会社・案件・作業ごとに作業時間を記録し、
+                過去の作業内容を振り返ることができます。
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Text="■ 動作環境"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                Windows
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Text="■ データについて"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                作業データはお使いのPC内に保存されます。
+                <LineBreak />
+                インターネット接続は必要ありません。
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Text="■ 開発者"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                Kumiko Arai
+                <LineBreak />
+                <LineBreak />
+                GitHub
+                <LineBreak />
+                <Button Content="GitHubを開く"
+                    Padding="7"
+                    HorizontalAlignment="Left"
+                    Click="OpenGitHub_Click" />
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Text="■ ライセンス"
+                    FontWeight="Bold"/>
+                <LineBreak />
+                Copyright © 2026 Kumiko Arai
+            </TextBlock>
+        </ScrollViewer>
+    </Border>
+</Window>

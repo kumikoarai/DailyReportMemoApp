@@ -1,6 +1,9 @@
-﻿using DailyReportMemoApp.Models;
+﻿using DailyReportMemoApp.Common;
+using DailyReportMemoApp.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +63,22 @@ namespace DailyReportMemoApp.Views
                 scrollViewer.Visibility = Visibility.Visible;
                 _currentHelpContent = scrollViewer;
             }
+        }
+
+        /// <summary>
+        /// 「データ保存フォルダを開く」ボタンを押下時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenDataFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Directory.CreateDirectory(AppPaths.DataFolderPath);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = AppPaths.DataFolderPath,
+                UseShellExecute = true
+            });
         }
     }
 

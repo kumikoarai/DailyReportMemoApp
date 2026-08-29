@@ -16,11 +16,45 @@
         </Grid.ColumnDefinitions>
 
         <!-- 左側メニュー -->
-        <ScrollViewer Grid.Row="0"
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock 
+                Grid.Row="0"
+                Text="会社名："
+                FontSize="12"
+                Margin="0" />
+            <Grid Grid.Row="1"
+                  Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0"
+                                 x:Name="CompanyName"
+                                 Width="180"
+                                 Height="20"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Left"
+                                 HorizontalScrollBarVisibility="Disabled"/>
+
+                <Button Grid.Column="1"
+                                Content="追加"
+                                Width="Auto"
+                                Height="Auto"
+                                HorizontalAlignment="Center"
+                                Click="CompanyEntry_Click"/>
+            </Grid>
+            <ScrollViewer Grid.Row="2"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="BtnListPanel" />
-        </ScrollViewer>
+                <StackPanel x:Name="BtnListPanel" />
+            </ScrollViewer>
+        </Grid>
 
         <!-- 右側 -->
         <Grid Grid.Column="1">

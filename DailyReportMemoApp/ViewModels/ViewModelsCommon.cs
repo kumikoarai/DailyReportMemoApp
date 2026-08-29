@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DailyReportMemoApp.ViewModels
 {
-    public class Common
+    public class ViewModelsCommon
     {
         /// <summary>
         /// TimeSpanを取得するメソッド

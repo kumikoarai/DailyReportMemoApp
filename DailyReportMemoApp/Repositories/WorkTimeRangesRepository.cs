@@ -12,7 +12,7 @@ namespace DailyReportMemoApp.Repositories
 {
     public class WorkTimeRangesRepository
     {
-        private Common _common = new();
+        private ViewModelsCommon _common = new();
 
 
         /// <summary>

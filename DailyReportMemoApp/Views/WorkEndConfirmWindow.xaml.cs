@@ -31,7 +31,7 @@ namespace DailyReportMemoApp.Views
         private WorkLogsRepository _workLogsRepository = new();
         private ProjectTaskItemsRepository _projectTaskItemsRepository = new();
         private WorkTimeRangesRepository _workTimeRangesRepository = new();
-        private Common _common = new();
+        private ViewModelsCommon _common = new();
         private TimeSpan _TodayEndWorkTime = new TimeSpan(23, 59, 59);
         private DateTime _now;
 
@@ -45,7 +45,7 @@ namespace DailyReportMemoApp.Views
 
             _now = DateTime.Now;
 
-            _TodayEndWorkTime = Common.workTimeSpan(_now, _workingOnLogs);
+            _TodayEndWorkTime = ViewModelsCommon.workTimeSpan(_now, _workingOnLogs);
 
             // 作業中のタスクをロードする
             LoadTasks();

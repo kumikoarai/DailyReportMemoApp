@@ -40,7 +40,7 @@
                     Tag="WorkLog"
                     Padding="15,10" />
 
-                <ListBoxItem Content="特別作業"
+                <ListBoxItem Content="デフォルト作業"
                     Tag="SpecialWork"
                     Padding="15,10" />
 
@@ -115,7 +115,7 @@
                         <LineBreak />
                         STEP 2
                         <LineBreak />
-                        今日の作業を選択
+                        今日の作業を開始
                         <LineBreak />
                         ↓
                         <LineBreak />
@@ -140,7 +140,7 @@
 
             <ScrollViewer x:Name="AboutItems"
                   VerticalScrollBarVisibility="Auto"
-                  >
+                  Visibility="Collapsed">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -192,7 +192,7 @@
                         </StackPanel>
                         <LineBreak />
                         <LineBreak />
-                        登録した会社・案件・作業は、一括案件管理画面から確認できます。
+                        登録した会社・案件・作業は、「一括案件管理」画面から確認できます。
                     </TextBlock>
                 </Grid>
             </ScrollViewer>
@@ -200,41 +200,246 @@
             <ScrollViewer x:Name="WorkLog"
                   VerticalScrollBarVisibility="Auto"
                   Visibility="Collapsed">
-                <TextBlock Text="作業の記録"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
-            </ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="作業の記録"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
 
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        <TextBlock Text="◆会社・案件・作業を登録"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「デフォルト作業設定」「一括案件管理」にて、会社・案件・作業を登録します。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆今日の作業を開始"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「開始」ボタンを押下すると、作業時間の記録が始まります。
+                        <LineBreak />
+                        「作業記録」画面が表示され、「デフォルト作業設定」「一括案件管理」で登録した作業項目が表示されます。
+                        <LineBreak />
+                        <LineBreak />
+                        初期表示は、「デフォルト作業設定」画面にて登録した作業のみ表示されます。
+                        <LineBreak />
+                        「一括案件管理」や「案件を追加」ボタンにて登録された作業は、前日に時間の記録があった作業のみ表示されます。
+                        <LineBreak />
+                        「デフォルト作業設定」にて、「初期開始」で項目を選択すると、「開始」後即座にその作業項目に時間が記録されます。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆作業時間を記録"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「作業記録」画面にて、作業項目のラジオボタンを選択すると、作業開始時間が自動で記録されます。
+                        <LineBreak />
+                        別の作業を開始するときは、対象の作業を選択して作業を切り替えます。この時、直前の作業項目の終了時間も自動で記録されます。
+                        <LineBreak />
+                        <LineBreak />
+                        日付をまたいだ作業時間は、翌1:00を25:00、翌2:00を26:00として表示します。
+                        <LineBreak />
+                        作業時間は、手動入力での修正も可能です。
+                        <LineBreak />
+                        「案件を追加」ボタンで、今日作業したい作業を追加できます。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆1日の作業を終了"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        業務が終了したら「本日の作業終了」ボタンを押下し、記録を終了します。
+                        <LineBreak />
+                        最後の作業の終了時間が作業中の場合であっても、「本日の作業終了」ボタンで作業を終了すると、ボタン押下時の時刻が自動で記録されます。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆過去作業ログを確認"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「過去作業ログ」画面にて、記録した過去の作業を確認できます。
+                        年月ごと、会社ごとに確認することができます。
+                        <LineBreak />
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
             <ScrollViewer x:Name="SpecialWork"
                   VerticalScrollBarVisibility="Auto"
                   Visibility="Collapsed">
-                <TextBlock Text="特別作業"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
-            </ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="デフォルト作業とは"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
 
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        特定の会社や案件に属さない作業を記録するための機能です。
+                        <LineBreak />
+                        たとえば、社内業務や休憩など、案件とは別に管理したい時間を登録できます。
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
             <ScrollViewer x:Name="PastWorkLogs"
                   VerticalScrollBarVisibility="Auto"
                   Visibility="Collapsed">
-                <TextBlock Text="過去作業ログ"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="過去作業ログ"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        「過去作業ログ」画面では、これまでに記録した作業内容や作業時間を確認できます。
+                        <LineBreak />
+                        年月を指定すると、その期間に記録した作業ログが表示されます。
+                        <LineBreak />
+                        また、会社や案件ごとに作業内容を確認できます。
+                    </TextBlock>
+                </Grid>
             </ScrollViewer>
 
             <ScrollViewer x:Name="AboutData"
                   VerticalScrollBarVisibility="Auto"
                   Visibility="Collapsed">
-                <TextBlock Text="データについて"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
-            </ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="データについて"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
 
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        <TextBlock Text="◆データの保存場所"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        しごとログに登録した会社・案件・作業内容・作業時間などのデータは、お使いのPC内に保存されます。
+                        <LineBreak />
+                        データは外部のサーバーやクラウドには保存されません。
+                        <LineBreak />
+                        <LineBreak />
+                        保存場所：
+                        <LineBreak />
+                        %LocalAppData%\ShigotoLog\
+                        <LineBreak />
+                        <LineBreak />
+                        <Button Content="データ保存フォルダを開く"
+                            Click="OpenDataFolder_Click"
+                            Padding="7"
+                            HorizontalAlignment="Left" />
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆インターネット通信について"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        しごとログは、インターネットに接続していない環境でも使用できます。
+                        <LineBreak />
+                        登録した作業内容などのデータが、インターネットを通じて外部に送信されることはありません。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆アンインストールについて"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        しごとログをアンインストールしても、保存した作業データは削除されません。
+                        <LineBreak />
+                        再インストール後もこれまでのデータを使用したい場合は、データを削除せずにそのまま残してください。
+                        <LineBreak />
+                        作業データも含めて完全に削除したい場合は、アンインストール後にデータ保存フォルダを手動で削除してください。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆バックアップについて"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        大切な作業記録を失わないため、定期的にデータをバックアップすることをおすすめします。
+                        <LineBreak />
+                        バックアップを行う場合は、しごとログを終了した状態でデータファイルをコピーし、安全な場所に保管してください。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="◆データの削除について"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        保存されているすべての作業データを削除する場合は、しごとログを終了してからデータ保存フォルダを削除してください。
+                        <LineBreak />
+                        一度削除したデータは元に戻すことができません。必要なデータがある場合は、削除する前にバックアップしてください。
+                        <LineBreak />
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
             <ScrollViewer x:Name="FAQ"
                   VerticalScrollBarVisibility="Auto"
                   Visibility="Collapsed">
-                <TextBlock Text="よくある質問"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="よくある質問"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Margin="0,0,0,10" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        TextWrapping="Wrap">
+                        <TextBlock Text="Q. 新しい案件を追加したいです。"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「一括案件管理」画面または「作業記録」画面の「案件を追加」ボタンから、会社を選択して案件を登録してください。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="Q. 案件に属さない作業を記録したいです。"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                       デフォルト作業を使用してください。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="Q. 過去に行った作業を確認したいです。"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        「過去作業ログ」画面から確認できます。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="Q. アプリを終了しても記録は残りますか？"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        保存されたデータは、アプリを終了してもPC内に保持されます。
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="Q. インターネット接続は必要ですか？"
+                            FontWeight="Bold"/>
+                        <LineBreak />
+                        いいえ。本アプリはオフラインで使用できます。
+                    </TextBlock>
+                </Grid>
             </ScrollViewer>
 
         </Grid>

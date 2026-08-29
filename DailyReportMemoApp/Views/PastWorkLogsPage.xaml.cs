@@ -26,7 +26,7 @@ namespace DailyReportMemoApp.Views
     public partial class PastWorkLogsPage : Page
     {
         private WorkLogsRepository _workLogsRepository = new();
-        private Common _common = new();
+        private ViewModelsCommon _common = new();
 
         public PastWorkLogsPage(YearMonthItem? yearMonthItem, CompanyProjectItem? companyProjectItem)
         {

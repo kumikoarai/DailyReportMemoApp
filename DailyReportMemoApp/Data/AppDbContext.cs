@@ -1,3 +1,4 @@
+using DailyReportMemoApp.Common;
 using DailyReportMemoApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,16 +33,9 @@ namespace DailyReportMemoApp.Data
                 return;
             }
 
-            var folderPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "DailyReportMemoApp"
-            );
+            Directory.CreateDirectory(AppPaths.DataFolderPath);
 
-            Directory.CreateDirectory(folderPath);
-
-            var dbPath = Path.Combine(folderPath, "DailyReportMemo.db");
-
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            optionsBuilder.UseSqlite($"Data Source={AppPaths.DatabasePath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

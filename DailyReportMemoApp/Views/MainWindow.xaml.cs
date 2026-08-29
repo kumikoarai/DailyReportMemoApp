@@ -109,5 +109,17 @@ namespace DailyReportMemoApp
             helpWindow.ShowDialog();
 
         }
+
+        private void OpenAboutThisApp_Click(object sender, RoutedEventArgs e)
+        {
+            AboutThisApp aboutThisApp = new()
+            {
+                Owner = this
+            };
+
+            aboutThisApp.ShowDialog();
+
+        }
+
     }
 }

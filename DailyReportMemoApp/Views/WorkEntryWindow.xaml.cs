@@ -42,7 +42,7 @@ namespace DailyReportMemoApp
         private readonly List<RadioButton> _radioButtons = new();
         private bool _skipLostFocus;
         private ChangeWorkTimeRange _changeWorkTimeRange = new ChangeWorkTimeRange();
-        private Common _common = new();
+        private ViewModelsCommon _common = new();
 
 
         public WorkEntryWindow()
@@ -752,7 +752,7 @@ namespace DailyReportMemoApp
 
                 var now = DateTime.Now;
 
-                TimeSpan nowTime = Common.workTimeSpan(now, _workingOnLogs);
+                TimeSpan nowTime = ViewModelsCommon.workTimeSpan(now, _workingOnLogs);
 
                 foreach (var workLog in workLogsList)
                 {
@@ -1212,6 +1212,18 @@ namespace DailyReportMemoApp
             helpWindow.ShowDialog();
 
         }
+
+        private void OpenAboutThisApp_Click(object sender, RoutedEventArgs e)
+        {
+            AboutThisApp aboutThisApp = new()
+            {
+                Owner = this
+            };
+
+            aboutThisApp.ShowDialog();
+
+        }
+
 
     }
 
