@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DailyReportMemoApp.Views
 {
@@ -101,8 +102,12 @@ namespace DailyReportMemoApp.Views
             {
                 var CompanyExpander = new Expander
                 {
-                    Header = $"{CompanyGroup.Key}",
-                    Margin = new Thickness(0, 0, 0, 20)
+                    Header = new TextBlock
+                    {
+                        Text = $"{CompanyGroup.Key}",
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    Margin = new Thickness(0, 0, 0, 20),
                 };
 
                 var projectPanel = new StackPanel();
