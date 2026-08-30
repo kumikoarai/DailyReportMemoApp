@@ -8,22 +8,21 @@
 
 ### 作業記録画面
 
-![作業記録画面](screenshots/workEntry.png)
+<img src="screenshots/workEntry.png" alt="作業記録画面" width="48%">
 
 ### 一括案件管理画面
 
-![一括案件管理画面](screenshots/projectManagement.png)
+<img src="screenshots/projectManagement.png" alt="一括案件管理画面" width="48%">
 
 ### デフォルト作業設定画面
 
-![一括案件管理画面](screenshots/defaultWorkSettings.png)
+<img src="screenshots/defaultWorkSettings.png" alt="デフォルト作業設定画面" width="48%">
 
 ### 過去の作業ログ
-
-![過去の作業ログ（年月）](screenshots/workLog1.png)
-
-![過去の作業ログ（会社・案件）](screenshots/workLog2.png)
-
+<p align="center">
+    <img src="screenshots/workLog1.png" alt="過去の作業ログ（年月）" width="48%">
+    <img src="screenshots/workLog2.png" alt="過去の作業ログ（会社・案件）" width="48%">
+</p >
 
 ## 主な機能
 
