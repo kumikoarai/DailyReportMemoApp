@@ -79,11 +79,11 @@ Use MVVM as the general architectural direction, while respecting the current im
 Prefer the following dependency direction when applicable:
 
 View
-Å® ViewModel
-Å® Service (when needed)
-Å® Repository
-Å® AppDbContext
-Å® SQLite
+ÔøΩÔøΩ ViewModel
+ÔøΩÔøΩ Service (when needed)
+ÔøΩÔøΩ Repository
+ÔøΩÔøΩ AppDbContext
+ÔøΩÔøΩ SQLite
 
 A Service layer is optional and should be introduced only when business logic or coordination between repositories justifies it.
 
@@ -109,7 +109,7 @@ Use SQLite as the database provider.
 
 The SQLite database file used by the current implementation is stored under:
 
-`Environment.SpecialFolder.LocalApplicationData/DailyReportMemoApp/DailyReportMemo.db`
+`Environment.SpecialFolder.LocalApplicationData/ShigotoLog/ShigotoLog.db`
 
 Use the existing EF Core configuration and migrations as the source of truth for the database schema.
 
