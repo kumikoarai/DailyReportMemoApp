@@ -365,3 +365,9 @@ FodyWeavers.xsd
 *.db
 *.sqlite
 *.sqlite3
+
+# Inno Setup output
+DailyReportMemoApp/Installer/Output/
+
+# Backup files
+*.bak
