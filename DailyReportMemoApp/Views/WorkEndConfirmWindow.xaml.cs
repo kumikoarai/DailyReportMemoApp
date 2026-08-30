@@ -103,7 +103,6 @@ namespace DailyReportMemoApp.Views
 
                 var ttlName = "";
                 var taskName = "";
-                var ttlOnly = false;
 
                 // 作業時間が存在する場合のみ、会社名・プロジェクト名・タスク名を表示する
                 if (timeExist) 
@@ -125,7 +124,6 @@ namespace DailyReportMemoApp.Views
                                 worktimesCP = new TimeSpan(0, 0, 0);
                                 ttlName = $"▼{companyName} / {projectName}";
                                 taskName = $"・{taskItemName}";
-                                ttlOnly = true;
                             }
                         }
                         else
@@ -133,7 +131,6 @@ namespace DailyReportMemoApp.Views
                             worktimesCP = new TimeSpan(0, 0, 0);
                             ttlName = $"▼{companyName} / {projectName}";
                             taskName = $"・{taskItemName}";
-                            ttlOnly = true;
                         }
 
                         companyIds = workLog.ProjectTaskItems?.CompanyProjects?.CompanyId ?? -1;
