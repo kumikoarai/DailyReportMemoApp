@@ -34,7 +34,7 @@ namespace DailyReportMemoApp.Views
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://github.com/kumikoarai",
+                FileName = "https://github.com/kumikoarai/DailyReportMemoApp",
                 UseShellExecute = true
             });
         }
