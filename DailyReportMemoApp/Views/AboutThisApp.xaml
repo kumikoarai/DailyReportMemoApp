@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DailyReportMemoApp.Views"
+        Icon="../Assets/ShigotoLog.ico"
         mc:Ignorable="d"
         Title="このアプリについて" Height="470" Width="470"
         WindowStartupLocation="CenterOwner"

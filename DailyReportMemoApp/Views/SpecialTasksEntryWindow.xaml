@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DailyReportMemoApp"
         mc:Ignorable="d"
+        Icon="../Assets/ShigotoLog.ico"
         Title="デフォルト作業設定"
         Height="450"
         Width="800"

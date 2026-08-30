@@ -12,6 +12,8 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\ShigotoLog
 DefaultGroupName={#MyAppName}
 
+SetupIconFile=..\Assets\ShigotoLog.ico
+
 OutputDir=Output
 OutputBaseFilename=ShigotoLogSetup
 Compression=lzma2
