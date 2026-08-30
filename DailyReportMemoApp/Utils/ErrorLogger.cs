@@ -19,7 +19,7 @@ namespace DailyReportMemoApp.Utils
 
                 string logDirectory = Path.Combine(
                     appDataPath,
-                    "DailyReportMemoApp",
+                    "ShigotoLog",
                     "Logs");
 
                 Directory.CreateDirectory(logDirectory);
