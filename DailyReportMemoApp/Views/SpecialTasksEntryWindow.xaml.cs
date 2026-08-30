@@ -312,6 +312,8 @@ namespace DailyReportMemoApp
                 }
 
                 db.SaveChanges();
+
+                transaction.Commit();
             }
             catch (DbUpdateException ex)
             {
