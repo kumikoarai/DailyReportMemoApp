@@ -23,9 +23,9 @@ namespace DailyReportMemoApp.Repositories
             {
                 return db.ProjectTaskItems
                        .Include(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Companies)
+                            .ThenInclude(x => x!.Companies)
                        .Include(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Projects)
+                            .ThenInclude(x => x!.Projects)
                        .Include(x => x.TaskItems)
                        .Where(cp => cp.CompanyProjectId == companyProjectId)
                        .ToList();
@@ -45,9 +45,9 @@ namespace DailyReportMemoApp.Repositories
             {
                 return db.ProjectTaskItems
                        .Include(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Companies)
+                            .ThenInclude(x => x!.Companies)
                        .Include(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Projects)
+                            .ThenInclude(x => x!.Projects)
                        .Include(x => x.TaskItems)
                        .Where(cp => cp.IsCurrent)
                        .ToList();
@@ -102,8 +102,9 @@ namespace DailyReportMemoApp.Repositories
             {
                 curProjectTaskItem.IsCurrent = false;
                 curProjectTaskItem.UpdatedAt = DateTime.Now;
-                db.SaveChanges();
             }
+
+            db.SaveChanges();
 
             return true;
         }

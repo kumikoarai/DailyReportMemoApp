@@ -20,20 +20,20 @@ namespace DailyReportMemoApp.Repositories
         /// <returns></returns>
         public List<WorkLog> GetWorkLogs(int workingOnId)
         {
-            using (var db = new Data.AppDbContext())
-            {
-                return db.WorkLogs
+            using var db = new AppDbContext();
+
+            return db.WorkLogs
                     .AsNoTracking()
                     .AsSplitQuery()
                     .Include(x => x.WorkTimeRanges)
                     .Include(x => x.ProjectTaskItems)
-                        .ThenInclude(x => x.TaskItems)
+                        .ThenInclude(x => x!.TaskItems)
                     .Include(x => x.ProjectTaskItems)
-                        .ThenInclude(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Companies)
+                        .ThenInclude(x => x!.CompanyProjects)
+                            .ThenInclude(x => x!.Companies)
                     .Include(x => x.ProjectTaskItems)
-                        .ThenInclude(x => x.CompanyProjects)
-                            .ThenInclude(x => x.Projects)
+                        .ThenInclude(x => x!.CompanyProjects)
+                            .ThenInclude(x => x!.Projects)
                    .Include(x => x.SpecialTasks)
                    .Where(wl => wl.WorkingOnId == workingOnId)
                    .OrderBy(wl => wl.SpecialTaskId == null)
@@ -42,7 +42,6 @@ namespace DailyReportMemoApp.Repositories
                    .ThenBy(wl => wl.ProjectTaskItems!.CompanyProjects!.ProjectId)
                    .ThenBy(wl => wl.ProjectTaskItems!.TaskItemId)
                    .ToList();
-            }
         }
 
 
@@ -53,13 +52,12 @@ namespace DailyReportMemoApp.Repositories
         /// <returns></returns>
         public List<WorkLog> GetSimpleWorkLogs(int workingOnId)
         {
-            using (var db = new Data.AppDbContext())
-            {
-                return db.WorkLogs
+            using var db = new AppDbContext();
+
+            return db.WorkLogs
                    .Include(x => x.WorkTimeRanges)
                    .Where(wl => wl.WorkingOnId == workingOnId)
                    .ToList();
-            }
         }
 
 
@@ -81,13 +79,13 @@ namespace DailyReportMemoApp.Repositories
                 .AsSplitQuery()
                 .Include(x => x.WorkTimeRanges)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.TaskItems)
+                    .ThenInclude(x => x!.TaskItems)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.CompanyProjects)
-                        .ThenInclude(x => x.Companies)
+                    .ThenInclude(x => x!.CompanyProjects)
+                        .ThenInclude(x => x!.Companies)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.CompanyProjects)
-                        .ThenInclude(x => x.Projects)
+                    .ThenInclude(x => x!.CompanyProjects)
+                        .ThenInclude(x => x!.Projects)
                 .Include(x => x.SpecialTasks)
                 .Include(x => x.WorkingOnLogs)
                 .Where(x =>
@@ -156,20 +154,22 @@ namespace DailyReportMemoApp.Repositories
                 .AsSplitQuery()
                 .Include(x => x.WorkTimeRanges)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.TaskItems)
+                    .ThenInclude(x => x!.TaskItems)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.CompanyProjects)
-                        .ThenInclude(x => x.Companies)
+                    .ThenInclude(x => x!.CompanyProjects)
+                        .ThenInclude(x => x!.Companies)
                 .Include(x => x.ProjectTaskItems)
-                    .ThenInclude(x => x.CompanyProjects)
-                        .ThenInclude(x => x.Projects)
+                    .ThenInclude(x => x!.CompanyProjects)
+                        .ThenInclude(x => x!.Projects)
                 .Include(x => x.SpecialTasks)
                 .Include(x => x.WorkingOnLogs)
                 .Where(x =>
                     x.ProjectTaskItems != null &&
-                    x.ProjectTaskItems.CompanyProjects!.CompanyId == companyId &&
-                    x.ProjectTaskItems.CompanyProjects!.ProjectId == projectId &&
-                    x.WorkingOnLogs!.WorkingOnFlg == false)
+                    x.ProjectTaskItems.CompanyProjects != null &&
+                    x.ProjectTaskItems.CompanyProjects.CompanyId == companyId &&
+                    x.ProjectTaskItems.CompanyProjects.ProjectId == projectId &&
+                    x.WorkingOnLogs != null &&
+                    x.WorkingOnLogs.WorkingOnFlg == false)
                 .OrderByDescending(x => x.WorkingOnLogs!.WorkDate)
                 .ToList();
 
@@ -244,10 +244,8 @@ namespace DailyReportMemoApp.Repositories
         /// <returns></returns>
         public bool ProjectTaskItemExists(int workingOnLogsID, int projectTaskItemId)
         {
-            using (var db = new Data.AppDbContext())
-            {
-                return db.WorkLogs.Any(pti => pti.ProjectTaskItemId == projectTaskItemId && pti.WorkingOnId == workingOnLogsID);
-            }
+            using var db = new AppDbContext();
+            return db.WorkLogs.Any(pti => pti.ProjectTaskItemId == projectTaskItemId && pti.WorkingOnId == workingOnLogsID);
         }
 
     }

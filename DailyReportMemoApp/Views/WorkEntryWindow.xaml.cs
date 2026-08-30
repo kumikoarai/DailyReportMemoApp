@@ -58,6 +58,16 @@ namespace DailyReportMemoApp
                 WorkingOn? newWorkingOn = WorkingOnRecordingStarted();
                 _workingOnLogs = newWorkingOn;
 
+                if (_workingOnLogs == null)
+                {
+                    MessageBox.Show(
+                        "今日の作業ログデータを作成できませんでした。",
+                        "エラー",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
                 nonToday = true;
             }
 
