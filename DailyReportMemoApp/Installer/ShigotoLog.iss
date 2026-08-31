@@ -15,7 +15,7 @@ DefaultGroupName={#MyAppName}
 SetupIconFile=..\Assets\ShigotoLog.ico
 
 OutputDir=Output
-OutputBaseFilename=ShigotoLogSetup
+OutputBaseFilename=ShigotoLog_Setup_v1.0.0
 Compression=lzma2
 SolidCompression=yes
 
