@@ -14,6 +14,22 @@ namespace DailyReportMemoApp.Repositories
     {
         private ViewModelsCommon _common = new();
 
+        /// <summary>
+        /// 作業時間が存在するか
+        /// </summary>
+        /// <param name="workingOnId"></param>
+        /// <returns></returns>
+        public bool ExistWorkTimeRangs(int workingOnId)
+        {
+            using (var db = new Data.AppDbContext())
+            {
+                return db.WorkTimeRanges
+                            .Any(wtr =>
+                                wtr.WorkLogs != null &&
+                                wtr.WorkLogs.WorkingOnId == workingOnId);
+            }
+        }
+
 
         /// <summary>
         /// 作業時間範囲を取得するメソッド
@@ -161,6 +177,29 @@ namespace DailyReportMemoApp.Repositories
                     return changeFailureWorkTimeRange; // 更新しない
                 }
 
+                // 前のレコードは存在するのに、StartTimeにつながるEndTimeのレコードが存在しない場合エラーとする。
+                var existsPreviousWorkTimeRange = db.WorkTimeRanges
+                    .Include(wtr => wtr.WorkLogs)
+                    .Where(wtr =>
+                        wtr.WorkLogs != null &&
+                        wtr.WorkLogs.WorkingOnId == workingOnId)
+                    .AsEnumerable()
+                    .Any(wtr =>
+                        wtr.StartTime < workTime.WorkTimeRange.StartTime);
+                if (targetEndWorkTimeRange == null && existsPreviousWorkTimeRange)
+                {
+                    return changeFailureWorkTimeRange;
+                }
+
+                if (targetEndWorkTimeRange != null)
+                {
+                    targetEndWorkTimeRange.EndTime = parsedNewTime;
+                    targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
+
+                    changeSuccessWorkTimeRange.SubTargetStartOrEnd = "end";
+                    changeSuccessWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
+                }
+
                 // 作業時間範囲の開始時間を更新する場合
                 var targetStartWorkTimeRange = db.WorkTimeRanges
                     .Include(wtr => wtr.WorkLogs)
@@ -176,19 +215,6 @@ namespace DailyReportMemoApp.Repositories
 
                 targetStartWorkTimeRange.StartTime = parsedNewTime;
                 targetStartWorkTimeRange.UpdatedAt = DateTime.Now;
-
-
-                if (targetEndWorkTimeRange == null)
-                {
-                    return changeFailureWorkTimeRange;
-                }
-
-                targetEndWorkTimeRange.EndTime = parsedNewTime;
-                targetEndWorkTimeRange.UpdatedAt = DateTime.Now;
-
-                changeSuccessWorkTimeRange.SubTargetStartOrEnd = "end";
-                changeSuccessWorkTimeRange.WorkTimeRangeId = targetEndWorkTimeRange.WorkTimeRangeId;
-
 
             }
             else if (workTime.StartOrEnd == "end") {

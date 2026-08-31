@@ -4,7 +4,7 @@
 #define MyAppExeName "ShigotoLog.exe"
 
 [Setup]
-AppId={{A8C67D5F-9F83-4E58-9B29-7CA27588F001}
+AppId={{a4f42a98-e5cf-4796-8eb9-2a2bdfce204c}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}

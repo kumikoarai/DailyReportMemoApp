@@ -85,6 +85,11 @@ namespace DailyReportMemoApp
             // 作業中のタスクをロードする
             LoadTasks();
 
+            if (!_workTimeRangesRepository.ExistWorkTimeRangs(_workingOnLogs.WorkingOnId))
+            {
+                nonToday = true;
+            }
+
             //作業中のタスクが存在しない場合
             if (nonToday)
             {
@@ -1125,7 +1130,7 @@ namespace DailyReportMemoApp
                                 rb.Tag is WorkLog workLog &&
                                 workLog.SpecialTaskId == specialTask?.SpecialTaskId);
 
-            if (radioButton != null)
+            if (specialTask != null && radioButton != null)
             {
                 //radioButton.IsChecked = true;
                 RadioButton_Checked(radioButton, new RoutedEventArgs());
