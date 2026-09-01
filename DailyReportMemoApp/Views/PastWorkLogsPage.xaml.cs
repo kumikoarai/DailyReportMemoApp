@@ -155,11 +155,12 @@ namespace DailyReportMemoApp.Views
                     document.Blocks.Add(workLogIdParagraph);
                 }
 
-                TimeSpan worktimes = new TimeSpan(0, 0, 0);
 
                 // 作業ログの作業時間を計算する
                 foreach (var workLogListGroup in groupedWorkLog.WorkLogListGroups)
                 {
+                    TimeSpan worktimes = new TimeSpan(0, 0, 0);
+
                     var count2 = workLogListGroup.WorkLogs
                                         .Sum(y => y.WorkTimeRanges.Count);
 
