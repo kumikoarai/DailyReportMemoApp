@@ -1,5 +1,5 @@
 #define MyAppName "しごとログ"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Kumiko Arai"
 #define MyAppExeName "ShigotoLog.exe"
 
@@ -15,7 +15,7 @@ DefaultGroupName={#MyAppName}
 SetupIconFile=..\Assets\ShigotoLog.ico
 
 OutputDir=Output
-OutputBaseFilename=ShigotoLog_Setup_v1.0.0
+OutputBaseFilename=ShigotoLog_Setup_v1.0.1
 Compression=lzma2
 SolidCompression=yes
 
