@@ -123,9 +123,9 @@ GitHub Releasesから最新版の `ShigotoLogSetup.exe` をダウンロードし
 
 ## バージョン
 
-### v1.0.0
+### v1.0.1
 
-初回リリース。
+
 
 
 ## ライセンス
